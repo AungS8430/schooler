@@ -6,8 +6,8 @@ services:
       - .env
     restart: always
     environment:
-      POSTGRES_USER: ${DB_user:-schooler_user}
-      POSTGRES_PASSWORD: ${DB_pw:-schooler_password}
+      POSTGRES_USER: ${DB_USER:-schooler_user}
+      POSTGRES_PASSWORD: ${DB_PASS:-schooler_password}
       POSTGRES_DB: schooler_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -33,8 +33,8 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DB_USER: ${DB_user:-schooler_user}
-      DB_PASS: ${DB_pw:-schooler_password}
+      DB_USER: ${DB_USER:-schooler_user}
+      DB_PASS: ${DB_PASS:-schooler_password}
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: schooler_db

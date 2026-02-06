@@ -2,14 +2,9 @@ from contextlib import asynccontextmanager
 from os import getenv
 from typing import Annotated
 
-from dotenv import load_dotenv
 from fastapi import Depends, FastAPI
 from fastapi_nextauth_jwt import NextAuthJWT
 from sqlmodel import Field, Session, SQLModel, create_engine, select
-
-# load .env
-load_dotenv()
-
 
 # get env var
 JWT_SECRET = getenv("secret")
