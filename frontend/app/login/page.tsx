@@ -17,7 +17,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="flex flex-row gap-5">
-          <GoogleIcon /><CardTitle className="my-auto">Sign in <span className="text-neutral-500">to join</span> Schooler <span className="text-neutral-500">with</span> Google</CardTitle>
+          <GoogleIcon /><CardTitle className="my-auto">Sign in <span className="text-neutral-500">to join</span> {process.env.ALLOWED_DOMAIN} <span className="text-neutral-500">with</span> Google</CardTitle>
         </CardHeader>
         <Separator />
         <CardContent className="flex flex-col gap-4">
