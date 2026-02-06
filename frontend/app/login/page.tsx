@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import GoogleIcon from "@/components/icons/google";
-import background from "@/public/background.png";
+import GradientBackground from "@/components/gradient-background";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -37,8 +37,11 @@ export default function LoginPage() {
           Learn more about <Link href="/terms" className="text-black hover:underline">Terms of Service</Link> and <Link href="/privacy" className="text-black hover:underline">Privacy Policy</Link>.
         </CardFooter>
       </Card>
-      <Image src={background} alt="Background" placeholder="blur" quality={100} fill sizes="100vw" className="bg-cover -z-20 absolute" />
-
+      <GradientBackground
+        className="-z-10"
+        color="var(--primary)"
+        bgColor="var(--background)"
+      />
     </div>
   );
 }
