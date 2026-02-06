@@ -31,7 +31,7 @@ services:
     container_name: schooler_fastapi
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - "8000:8000"
     environment:
       DB_USER: ${DB_user:-schooler_user}
       DB_PASSWORD: ${DB_pw:-schooler_password}
