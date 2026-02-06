@@ -11,7 +11,7 @@ from sqlmodel import Field, Session, SQLModel, create_engine, select
 load_dotenv()
 
 
-# get env
+# get env var
 JWT_SECRET = getenv("secret")
 if JWT_SECRET is None:
     raise Exception("JWT secret does not exist.")
@@ -32,9 +32,11 @@ if DB_NAME is None:
     raise Exception("DB_NAME Not found.")
 
 
+# config Database
 DB_URL = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 connect_args = {"check_same_thread": False}
 
+# init Database
 engine = create_engine(DB_URL, connect_args=connect_args)
 
 
@@ -50,6 +52,7 @@ def get_session():
 SessionDep = Annotated[Session, Depends(get_session)]
 
 
+# on server start up and shutdown
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     create_db_and_tables()
@@ -58,6 +61,7 @@ async def lifespan(app: FastAPI):
     print("close-down")
 
 
+# init fastapi
 app = FastAPI(lifespan=lifespan)
 
 
