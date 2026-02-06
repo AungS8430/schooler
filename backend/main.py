@@ -5,6 +5,7 @@ from typing import Annotated
 
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi_nextauth_jwt import NextAuthJWT
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
@@ -71,6 +72,18 @@ async def lifespan(app: FastAPI):
 
 # init fastapi
 app = FastAPI(lifespan=lifespan)
+
+
+# config CORS
+origins = []
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # load JWT
