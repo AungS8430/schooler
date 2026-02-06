@@ -1,13 +1,26 @@
+import logging
 from contextlib import asynccontextmanager
 from os import getenv
 from typing import Annotated
 
+from dotenv import load_dotenv
 from fastapi import Depends, FastAPI
 from fastapi_nextauth_jwt import NextAuthJWT
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
+logger = logging.getLogger("uvicorn.error")
+logger.setLevel(logging.INFO)
+
+# load env if it is not in docker
+ISDOCKER = getenv("ISDOCKER", "False")
+if ISDOCKER == "False":
+    logger.info("-> Currently running outside docker container.")
+    logger.info("-> Loading env file.")
+    load_dotenv("../.env")
+
+
 # get env var
-JWT_SECRET = getenv("secret")
+JWT_SECRET = getenv("SECRET")
 if JWT_SECRET is None:
     raise Exception("JWT secret does not exist.")
 DB_USER = getenv("DB_USER")
@@ -51,9 +64,9 @@ SessionDep = Annotated[Session, Depends(get_session)]
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     create_db_and_tables()
-    print("start-up")
+    logger.info("-> Start up server.")
     yield
-    print("close-down")
+    logger.info("-> Shutting down server.")
 
 
 # init fastapi
