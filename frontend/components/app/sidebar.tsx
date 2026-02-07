@@ -1,0 +1,201 @@
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+} from "@/components/ui/sidebar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import Logo from "@/components/icons/logo";
+import { User, LogOut, Users, School, List, Calendar, Book, Megaphone, Settings, MessageCircleQuestionMark, EllipsisVertical } from "lucide-react";
+import Link from "next/link";
+import { auth, signOut } from "@/auth";
+
+const PrimaryPages = [
+  {
+    href: "/app/announcements",
+    label: "Announcements",
+    icon: <Megaphone />
+  },
+  {
+    href: "/app/schedule",
+    label: "Schedule",
+    icon: <List />
+  },
+  {
+    href: "/app/calendar",
+    label: "Academic Calendar",
+    icon: <Calendar />
+  },
+  {
+    href: "/app/classes",
+    label: "Classes",
+    icon: <School />
+  },
+  {
+    href: "/app/people",
+    label: "People",
+    icon: <Users />
+  },
+  {
+    href: "/app/resources",
+    label: "Resources",
+    icon: <Book />
+  }
+]
+
+const SecondaryPages = [
+  {
+    href: "/app/settings",
+    label: "Settings",
+    icon: <Settings />
+  },
+  {
+    href:"/app/help",
+    label: "Help",
+    icon: <MessageCircleQuestionMark />
+  }
+]
+
+export default async function AppSidebar() {
+  const session = await auth();
+  return (
+    <Sidebar variant="floating">
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              className="data-[slot=sidebar-menu-button]:p-5!"
+              size="lg"
+            >
+              <Link href="/app">
+                <Logo className="size-5!" />
+                <span className="text-lg font-semibold">Schooler</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem className="gap-2">
+                {PrimaryPages.map((page) => (
+                  <SidebarMenuButton
+                    key={page.href}
+                    className="p-5"
+                    asChild
+                  >
+                    <Link href={page.href}>
+                      {page.icon}
+                      {page.label}
+                    </Link>
+                  </SidebarMenuButton>
+                ))}
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup className="mt-auto">
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem className="gap-2">
+                {SecondaryPages.map((page) => (
+                  <SidebarMenuButton
+                    key={page.href}
+                    className="p-5"
+                    asChild
+                  >
+                    <Link href={page.href}>
+                      {page.icon}
+                      {page.label}
+                    </Link>
+                  </SidebarMenuButton>
+                ))}
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-muted-foreground"
+                >
+                  <Avatar>
+                    <AvatarFallback>T</AvatarFallback>
+                  </Avatar>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-medium">{session?.user.name}</span>
+                    <span className="truncate text-xs text-muted-foreground">{session?.user.email}</span>
+                  </div>
+                  <EllipsisVertical className="ml-auto size-4!" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+                align="end"
+                side="right"
+                sideOffset={4}
+              >
+                <DropdownMenuLabel className="p-0 font-normal">
+                  <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                    <Avatar>
+                      <AvatarFallback>T</AvatarFallback>
+                    </Avatar>
+                    <div className="grid flex-1 text-left text-sm leading-tight">
+                      <span className="truncate font-medium text-black">{session?.user.name}</span>
+                      <span className="truncate text-xs text-muted-foreground">{session?.user.email}</span>
+                    </div>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem asChild>
+                    <Link href="/app/profile">
+                      <User />
+                      Profile
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                  <form action={async () => {
+                    "use server"
+                    await signOut()
+                  }}>
+                    <DropdownMenuItem asChild>
+                      <Button variant="destructive" className="w-full justify-start" type="submit">
+                        <LogOut />
+                        Sign out
+                      </Button>
+
+                    </DropdownMenuItem>
+
+                  </form>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
+  )
+}

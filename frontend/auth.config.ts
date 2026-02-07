@@ -15,7 +15,7 @@ export const authConfig = {
     }),
   ],
   pages: {
-    signIn: "/login",
+    signIn: "/",
   },
   callbacks: {
     // Enforce allowed domain and verified email
@@ -40,8 +40,7 @@ export const authConfig = {
     },
     authorized({ auth, request: { nextUrl }}) {
       const isLoggedIn = !!auth;
-      // consider `/login`, `/login/` and `/login?...` as the login page
-      const isOnLoginPage = nextUrl.pathname.startsWith("/login");
+      const isOnLoginPage = !nextUrl.pathname.startsWith("/app");
       const isAuthRoute = nextUrl.pathname.startsWith("/api/auth");
 
       if (isAuthRoute) {
@@ -49,7 +48,7 @@ export const authConfig = {
       }
 
       if (isOnLoginPage && isLoggedIn) {
-        return NextResponse.redirect(new URL("/", nextUrl));
+        return NextResponse.redirect(new URL("/app", nextUrl));
       }
 
       return !(!isLoggedIn && !isOnLoginPage);

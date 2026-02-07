@@ -1,0 +1,21 @@
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import AppSidebar from "@/components/app/sidebar";
+
+export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <SidebarProvider
+      style={
+        {
+          "--sidebar-width": "calc(var(--spacing) * 72)",
+          "--header-height": "calc(var(--spacing) * 12)",
+        } as React.CSSProperties
+      }
+    >
+      <AppSidebar />
+      <div>
+        <SidebarTrigger />
+        <main>{children}</main>
+      </div>
+    </SidebarProvider>
+  );
+}
