@@ -10,7 +10,6 @@ import { Separator } from "@/components/ui/separator";
 import GoogleIcon from "@/components/icons/google";
 import GradientBackground from "@/components/gradient-background";
 import Link from "next/link";
-import Image from "next/image";
 
 export default function LoginPage() {
   return (
