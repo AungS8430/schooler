@@ -7,7 +7,7 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
-  SidebarMenuButton,
+  SidebarMenuButton, SidebarSeparator,
 } from "@/components/ui/sidebar";
 import {
   DropdownMenu,
@@ -133,6 +133,8 @@ export default async function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarSeparator />
+
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -143,7 +145,7 @@ export default async function AppSidebar() {
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-muted-foreground"
                 >
                   <Avatar>
-                    <AvatarFallback>T</AvatarFallback>
+                    <AvatarFallback>{session?.user.name != null ? session?.user.name[0] : ""}</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-medium">{session?.user.name}</span>
@@ -161,7 +163,7 @@ export default async function AppSidebar() {
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <Avatar>
-                      <AvatarFallback>T</AvatarFallback>
+                      <AvatarFallback>{session?.user.name != null ? session?.user.name[0] : ""}</AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
                       <span className="truncate font-medium text-black">{session?.user.name}</span>
