@@ -1,5 +1,6 @@
 import type { NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
+import { NextResponse } from "next/server";
 
 export const authConfig = {
   providers: [
@@ -48,7 +49,7 @@ export const authConfig = {
       }
 
       if (isOnLoginPage && isLoggedIn) {
-        return false;
+        return NextResponse.redirect(new URL("/", nextUrl));
       }
 
       return !(!isLoggedIn && !isOnLoginPage);
