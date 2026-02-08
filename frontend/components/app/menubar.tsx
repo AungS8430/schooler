@@ -1,3 +1,5 @@
+"use client";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,18 +14,20 @@ import { Button } from "@/components/ui/button";
 import Logo from "@/components/icons/logo";
 import { User, LogOut } from "lucide-react";
 import Link from "next/link";
-import { auth, signOut } from "@/lib/auth";
+import { usePathname } from "next/navigation";
+import { useSession, signOut, SessionProvider } from "next-auth/react";
 import { PrimaryPages, SecondaryPages } from "@/config";
 
-export default async function AppMenuBar() {
-  const session = await auth();
+function AppMenuBarInner() {
+  const session = useSession();
+  const pathname = usePathname();
   return (
     <div className="fixed flex justify-center bottom-0 w-full md:hidden">
       <div className="bg-sidebar ring-1 ring-sidebar-border rounded-lg shadow-sm mb-2 flex">
         {PrimaryPages.slice(0, PrimaryPages.length / 2).map((page) => (
           <Button
             key={page.href}
-            variant="ghost"
+            variant={pathname.startsWith(page.href) ? "secondary" : "ghost"}
             asChild
             className="flex flex-col gap-1"
             size="icon-lg"
@@ -42,7 +46,7 @@ export default async function AppMenuBar() {
         {PrimaryPages.slice(PrimaryPages.length / 2).map((page) => (
           <Button
             key={page.href}
-            variant="ghost"
+            variant={pathname.startsWith(page.href) ? "secondary" : "ghost"}
             asChild
             className="flex flex-col gap-1"
             size="icon-lg"
@@ -57,10 +61,10 @@ export default async function AppMenuBar() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon-lg" className="ml-2 mb-2">
-              {session?.user?.image ? (
+              {session?.data?.user.image ? (
                 <Avatar>
-                  <AvatarImage src={session.user.image} alt={session.user.name || "User Avatar"} />
-                  <AvatarFallback>{session.user.name?.charAt(0)}</AvatarFallback>
+                  <AvatarImage src={session?.data?.user.image} alt={session?.data?.user.name || "User Avatar"} />
+                  <AvatarFallback>{session?.data?.user.name?.charAt(0)}</AvatarFallback>
                 </Avatar>
               ) : (
                 <User />
@@ -76,11 +80,11 @@ export default async function AppMenuBar() {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar>
-                  <AvatarFallback>{session?.user.name != null ? session?.user.name[0] : ""}</AvatarFallback>
+                  <AvatarFallback>{session?.data?.user.name != null ? session?.data?.user.name[0] : ""}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium text-black">{session?.user.name}</span>
-                  <span className="truncate text-xs text-muted-foreground">{session?.user.email}</span>
+                  <span className="truncate font-medium text-black">{session?.data?.user.name}</span>
+                  <span className="truncate text-xs text-muted-foreground">{session?.data?.user.email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
@@ -104,10 +108,7 @@ export default async function AppMenuBar() {
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
-            <form action={async () => {
-              "use server"
-              await signOut()
-            }}>
+            <form onSubmit={() => signOut}>
               <DropdownMenuItem asChild>
                 <Button variant="destructive" className="w-full justify-start" type="submit">
                   <LogOut />
@@ -119,5 +120,14 @@ export default async function AppMenuBar() {
         </DropdownMenu>
       </div>
     </div>
+  );
+}
+
+export default function AppMenuBar() {
+  return (
+    <SessionProvider>
+      <AppMenuBarInner />
+    </SessionProvider>
+
   );
 }

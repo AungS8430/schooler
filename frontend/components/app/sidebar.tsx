@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Sidebar,
   SidebarContent,
@@ -24,11 +26,13 @@ import { Button } from "@/components/ui/button";
 import Logo from "@/components/icons/logo";
 import { User, LogOut, EllipsisVertical } from "lucide-react";
 import Link from "next/link";
-import { auth, signOut } from "@/lib/auth";
+import { usePathname } from "next/navigation";
+import { SessionProvider, useSession, signOut } from "next-auth/react";
 import { PrimaryPages, SecondaryPages } from "@/config";
 
-export default async function AppSidebar() {
-  const session = await auth();
+function AppSidebarInner() {
+  const session = useSession();
+  const pathname = usePathname();
   return (
     <Sidebar variant="floating" className="hidden sm:block">
       <SidebarHeader>
@@ -40,7 +44,7 @@ export default async function AppSidebar() {
               size="lg"
             >
               <Link href="/app">
-                <Logo className="size-5!" />
+                <Logo className="size-5!"/>
                 <span className="text-lg font-semibold">Schooler</span>
               </Link>
             </SidebarMenuButton>
@@ -55,6 +59,7 @@ export default async function AppSidebar() {
                 {PrimaryPages.map((page) => (
                   <SidebarMenuButton
                     key={page.href}
+                    variant={pathname.startsWith(page.href) ? "secondary" : "default"}
                     className="p-5"
                     asChild
                   >
@@ -75,6 +80,7 @@ export default async function AppSidebar() {
                 {SecondaryPages.map((page) => (
                   <SidebarMenuButton
                     key={page.href}
+                    variant={pathname.startsWith(page.href) ? "secondary" : "default"}
                     className="p-5"
                     asChild
                   >
@@ -89,7 +95,7 @@ export default async function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarSeparator />
+      <SidebarSeparator/>
 
       <SidebarFooter>
         <SidebarMenu>
@@ -101,13 +107,14 @@ export default async function AppSidebar() {
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-muted-foreground"
                 >
                   <Avatar>
-                    <AvatarFallback>{session?.user.name != null ? session?.user.name[0] : ""}</AvatarFallback>
+                    <AvatarImage src={session?.data?.user.image || undefined} alt={session?.data?.user.name || "User Avatar"} />
+                    <AvatarFallback>{session?.data?.user.name != null ? session?.data?.user.name[0] : ""}</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">{session?.user.name}</span>
-                    <span className="truncate text-xs text-muted-foreground">{session?.user.email}</span>
+                    <span className="truncate font-medium">{session?.data?.user.name}</span>
+                    <span className="truncate text-xs text-muted-foreground">{session?.data?.user.email}</span>
                   </div>
-                  <EllipsisVertical className="ml-auto size-4!" />
+                  <EllipsisVertical className="ml-auto size-4!"/>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -119,30 +126,28 @@ export default async function AppSidebar() {
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <Avatar>
-                      <AvatarFallback>{session?.user.name != null ? session?.user.name[0] : ""}</AvatarFallback>
+                      <AvatarImage src={session?.data?.user.image || undefined} alt={session?.data?.user.name || "User Avatar"} />
+                      <AvatarFallback>{session?.data?.user.name != null ? session?.data?.user.name[0] : ""}</AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-medium text-black">{session?.user.name}</span>
-                      <span className="truncate text-xs text-muted-foreground">{session?.user.email}</span>
+                      <span className="truncate font-medium text-black">{session?.data?.user.name}</span>
+                      <span className="truncate text-xs text-muted-foreground">{session?.data?.user.email}</span>
                     </div>
                   </div>
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator />
+                <DropdownMenuSeparator/>
                 <DropdownMenuGroup>
                   <DropdownMenuItem asChild>
                     <Link href="/app/profile">
-                      <User />
+                      <User/>
                       Profile
                     </Link>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
-                <form action={async () => {
-                  "use server"
-                  await signOut()
-                }}>
+                <form onSubmit={() => signOut()}>
                   <DropdownMenuItem asChild>
                     <Button variant="destructive" className="w-full justify-start" type="submit">
-                      <LogOut />
+                      <LogOut/>
                       Sign out
                     </Button>
                   </DropdownMenuItem>
@@ -153,5 +158,13 @@ export default async function AppSidebar() {
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
+  )
+}
+
+export default function AppSidebar() {
+  return (
+    <SessionProvider>
+      <AppSidebarInner />
+    </SessionProvider>
   )
 }
