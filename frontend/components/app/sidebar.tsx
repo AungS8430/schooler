@@ -21,60 +21,15 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import Logo from "@/components/icons/logo";
-import { User, LogOut, Users, School, List, Calendar, Book, Megaphone, Settings, MessageCircleQuestionMark, EllipsisVertical } from "lucide-react";
+import { User, LogOut, EllipsisVertical } from "lucide-react";
 import Link from "next/link";
-import { auth, signOut } from "@/auth";
-
-const PrimaryPages = [
-  {
-    href: "/app/announcements",
-    label: "Announcements",
-    icon: <Megaphone />
-  },
-  {
-    href: "/app/schedule",
-    label: "Schedule",
-    icon: <List />
-  },
-  {
-    href: "/app/calendar",
-    label: "Academic Calendar",
-    icon: <Calendar />
-  },
-  {
-    href: "/app/classes",
-    label: "Classes",
-    icon: <School />
-  },
-  {
-    href: "/app/people",
-    label: "People",
-    icon: <Users />
-  },
-  {
-    href: "/app/resources",
-    label: "Resources",
-    icon: <Book />
-  }
-]
-
-const SecondaryPages = [
-  {
-    href: "/app/settings",
-    label: "Settings",
-    icon: <Settings />
-  },
-  {
-    href:"/app/help",
-    label: "Help",
-    icon: <MessageCircleQuestionMark />
-  }
-]
+import { auth, signOut } from "@/lib/auth";
+import { PrimaryPages, SecondaryPages } from "@/config";
 
 export default async function AppSidebar() {
   const session = await auth();
   return (
-    <Sidebar variant="floating">
+    <Sidebar variant="floating" className="hidden sm:block">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -180,19 +135,17 @@ export default async function AppSidebar() {
                     </Link>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
-                  <form action={async () => {
-                    "use server"
-                    await signOut()
-                  }}>
-                    <DropdownMenuItem asChild>
-                      <Button variant="destructive" className="w-full justify-start" type="submit">
-                        <LogOut />
-                        Sign out
-                      </Button>
-
-                    </DropdownMenuItem>
-
-                  </form>
+                <form action={async () => {
+                  "use server"
+                  await signOut()
+                }}>
+                  <DropdownMenuItem asChild>
+                    <Button variant="destructive" className="w-full justify-start" type="submit">
+                      <LogOut />
+                      Sign out
+                    </Button>
+                  </DropdownMenuItem>
+                </form>
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>
