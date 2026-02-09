@@ -23,7 +23,7 @@ function AppMenuBarInner() {
   const pathname = usePathname();
   return (
     <div className="fixed flex justify-center bottom-0 w-full md:hidden">
-      <div className="bg-sidebar ring-1 ring-sidebar-border rounded-lg shadow-sm mb-2 flex">
+      <div className="bg-sidebar ring-1 ring-sidebar-border rounded-lg shadow-sm mb-2 min-[490px]:scale-110 flex">
         {PrimaryPages.slice(0, PrimaryPages.length / 2).map((page) => (
           <Button
             key={page.href}
@@ -57,7 +57,7 @@ function AppMenuBarInner() {
           </Button>
         ))}
       </div>
-      <div className="min-[400px]:absolute right-2 bottom-0">
+      <div className="min-[400px]:absolute right-2 bottom-0 min-[490px]:scale-110">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon-lg" className="ml-2 mb-2">

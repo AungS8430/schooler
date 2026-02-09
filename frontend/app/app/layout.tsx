@@ -1,4 +1,4 @@
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarProvider } from '@/components/ui/sidebar';
 import AppSidebar from "@/components/app/sidebar";
 import AppMenuBar from "@/components/app/menubar";
 import GradientBackground from "@/components/gradient-background";
@@ -15,12 +15,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     >
       <AppSidebar />
       <AppMenuBar />
-      <div>
-        <SidebarTrigger className="hidden md:inline-flex" />
+      <div className="flex-1 overflow-hidden">
         <main>{children}</main>
       </div>
       <GradientBackground
-        className="-z-10"
+        className="-z-10 fixed"
         color="var(--primary)"
         bgColor="var(--background)"
       />
