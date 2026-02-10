@@ -22,7 +22,7 @@ function AppMenuBarInner() {
   const session = useSession();
   const pathname = usePathname();
   return (
-    <div className="fixed flex justify-center bottom-0 w-full md:hidden">
+    <div className="fixed flex justify-center bottom-0 w-full z-50 md:hidden">
       <div className="bg-sidebar ring-1 ring-sidebar-border rounded-lg shadow-sm mb-2 min-[490px]:scale-110 flex">
         {PrimaryPages.slice(0, PrimaryPages.length / 2).map((page) => (
           <Button
