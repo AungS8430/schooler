@@ -144,14 +144,12 @@ function AppSidebarInner() {
                     </Link>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
-                <form onSubmit={() => signOut()}>
-                  <DropdownMenuItem asChild>
-                    <Button variant="destructive" className="w-full justify-start" type="submit">
-                      <LogOut/>
-                      Sign out
-                    </Button>
-                  </DropdownMenuItem>
-                </form>
+                <DropdownMenuItem asChild>
+                  <Button variant="destructive" className="w-full justify-start" onClick={() => signOut()}>
+                    <LogOut />
+                    Sign out
+                  </Button>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>
