@@ -144,22 +144,23 @@ export default function Timetable() {
 
   return (
     <div className="overflow-auto w-fit max-w-full p-2">
-      {progressPercent !== null && (
+      <div className="relative">
+        {progressPercent !== null && (
+          <div
+            className="absolute top-0 bottom-0 z-10 bg-primary shadow-lg ring-1 ring-accent"
+            style={{
+              left: `calc(7rem + (100% - 7rem) * ${progressPercent / 100})`,
+              width: '3px',
+              borderRadius: '2px',
+              pointerEvents: 'none',
+              transition: 'left 0.5s cubic-bezier(0.4,0,0.2,1)'
+            }}
+          />
+        )}
         <div
-          className="absolute top-0 bottom-0 z-10 bg-primary shadow-lg mt-22 ring-1 ring-accent"
-          style={{
-            left: `calc(${progressPercent}% + 100px / 2)`,
-            width: '3px',
-            borderRadius: '2px',
-            pointerEvents: 'none',
-            transition: 'left 0.5s cubic-bezier(0.4,0,0.2,1)'
-          }}
-        />
-      )}
-      <div
-        className="grid items-stretch gap-1"
-        style={{ gridTemplateColumns: gridColumns }}
-      >
+          className="grid items-stretch gap-1"
+          style={{ gridTemplateColumns: gridColumns }}
+        >
         <div className="w-28" />
         {usedSlots.map(slot => (
           <div key={slot.id} className="text-xs md:text-sm font-bold flex items-center">
@@ -199,6 +200,7 @@ export default function Timetable() {
             ...cells
           ];
         })}
+      </div>
       </div>
     </div>
   );
