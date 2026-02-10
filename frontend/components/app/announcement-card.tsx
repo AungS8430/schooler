@@ -24,7 +24,7 @@ interface AnnouncementCardProps {
   priority: number;
 }
 
-export default async function AnnouncementCard({ id, title, description, thumbnail, author, date, target, priority }: AnnouncementCardProps) {
+export default function AnnouncementCard({ id, title, description, thumbnail, author, date, target, priority }: AnnouncementCardProps) {
   return (
     <Card className="w-88 max-h-120 shrink-0">
       {
@@ -39,8 +39,9 @@ export default async function AnnouncementCard({ id, title, description, thumbna
           </Badge>
         </CardAction>
         <CardTitle>{title}</CardTitle>
-        <CardDescription className="">{description}</CardDescription>
+        <CardDescription>{description}</CardDescription>
       </CardHeader>
+      <div className="grow" />
       <CardContent>
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-3">
