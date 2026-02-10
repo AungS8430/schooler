@@ -17,7 +17,7 @@ ISDOCKER = getenv("ISDOCKER", "False")
 if ISDOCKER == "False":
     logger.info("-> Currently running outside docker container.")
     logger.info("-> Loading env file.")
-    load_dotenv("../.env")
+    load_dotenv("./.env")
 
 
 # get env var
