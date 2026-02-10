@@ -42,7 +42,7 @@ def checkRoom(room: datamodel.Room, cases: str):
 
 
 def getSpecial(selectedRoom: dict[str, list[dict]], action: str) -> list[dict]:
-    if action[0:6] == "class-":
+    if action[0:6] == "class-" and action[6:] in datamodel.TIME_LOOKUP.values():
         return selectedRoom[action[6:]]
     for special in loadSpecial():
         if special["class name"] == action:
