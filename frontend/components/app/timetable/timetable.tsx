@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect} from "react";
+import { useState, useEffect, useRef} from "react";
 
 type Slot = {
   id: string;
@@ -110,6 +110,10 @@ function getCurrentSlot(slotsToCheck: Slot[], currentTime: string) {
 export default function Timetable() {
   const [currentDay, setCurrentDay] = useState<number>(0);
   const [currentTime, setCurrentTime] = useState<string>("");
+  const [dayColumnWidth, setDayColumnWidth] = useState<number>(112); // default 7rem
+  const [gridWidth, setGridWidth] = useState<number>(0);
+  const dayColumnRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const update = () => {
@@ -124,32 +128,82 @@ export default function Timetable() {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const measureWidth = () => {
+      if (dayColumnRef.current && gridRef.current) {
+        const dayWidth = dayColumnRef.current.offsetWidth;
+        const totalGridWidth = gridRef.current.scrollWidth;
+        setDayColumnWidth(dayWidth);
+        setGridWidth(totalGridWidth);
+      }
+    };
+
+    // Measure immediately
+    measureWidth();
+
+    // Re-measure after a delay to ensure layout is complete
+    const timer = setTimeout(measureWidth, 50);
+
+    // Measure on window resize
+    window.addEventListener('resize', measureWidth);
+
+    return () => {
+      window.removeEventListener('resize', measureWidth);
+      clearTimeout(timer);
+    };
+  }, []);
+
   const gridColumns = `repeat(${usedSlots.length + 1}, minmax(75px, 1fr))`;
   const currentSlotId = getCurrentSlot(usedSlots, currentTime);
 
   function getTimeProgressPercent() {
-    const slotIdx = usedSlots.findIndex(slot => slot.id === currentSlotId);
-    if (slotIdx === -1) return null;
     const [curHour, curMin] = currentTime.split(":").map(Number);
     const curMinutes = curHour * 60 + curMin;
-    const slot = usedSlots[slotIdx];
-    const [startHour, startMin] = slot.start.split(":").map(Number);
-    const [endHour, endMin] = slot.end.split(":").map(Number);
-    const startMinutes = startHour * 60 + startMin;
-    const endMinutes = endHour * 60 + endMin;
-    const slotProgress = Math.max(0, Math.min(1, (curMinutes - startMinutes) / (endMinutes - startMinutes)));
-    return ((slotIdx + slotProgress) / usedSlots.length) * 100;
+
+    for (let i = 0; i < usedSlots.length; i++) {
+      const slot = usedSlots[i];
+      const [startHour, startMin] = slot.start.split(":").map(Number);
+      const [endHour, endMin] = slot.end.split(":").map(Number);
+      const startMinutes = startHour * 60 + startMin;
+      const endMinutes = endHour * 60 + endMin;
+
+      if (curMinutes >= startMinutes && curMinutes < endMinutes) {
+        const slotProgress = Math.max(0, Math.min(1, (curMinutes - startMinutes) / (endMinutes - startMinutes)));
+        return ((i + slotProgress) / usedSlots.length) * 100;
+      }
+
+      if (i < usedSlots.length - 1) {
+        const nextSlot = usedSlots[i + 1];
+        const [nextStartHour, nextStartMin] = nextSlot.start.split(":").map(Number);
+        const nextStartMinutes = nextStartHour * 60 + nextStartMin;
+
+        if (curMinutes >= endMinutes && curMinutes < nextStartMinutes) {
+          // Snap to the end of current column (i + 1) which is the start of the next column
+          return ((i + 1) / usedSlots.length) * 100;
+        }
+      }
+    }
+
+    const firstSlot = usedSlots[0];
+    const [firstHour, firstMin] = firstSlot.start.split(":").map(Number);
+    const firstMinutes = firstHour * 60 + firstMin;
+    if (curMinutes < firstMinutes) {
+      return 0;
+    }
+
+    return 100;
   }
   const progressPercent = getTimeProgressPercent();
 
   return (
     <div className="overflow-auto w-fit max-w-full p-2">
+
       <div className="relative">
-        {progressPercent !== null && (
+        {progressPercent !== null && gridWidth > 0 && (
           <div
             className="absolute top-0 bottom-0 z-10 bg-primary shadow-lg ring-1 ring-accent"
             style={{
-              left: `calc(7rem + (100% - 7rem) * ${progressPercent / 100})`,
+              left: `${dayColumnWidth + (gridWidth - dayColumnWidth) * (progressPercent / 100) - 2}px`,
               width: '3px',
               borderRadius: '2px',
               pointerEvents: 'none',
@@ -158,10 +212,11 @@ export default function Timetable() {
           />
         )}
         <div
+          ref={gridRef}
           className="grid items-stretch gap-1"
           style={{ gridTemplateColumns: gridColumns }}
         >
-        <div className="w-28" />
+        <div ref={dayColumnRef} />
         {usedSlots.map(slot => (
           <div key={slot.id} className="text-xs md:text-sm font-bold flex items-center">
             {slot.start}<br />- {slot.end}
