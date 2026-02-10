@@ -1,4 +1,4 @@
-import Timetable from "@/components/app/timetable/timetable";
+import Timetable from "@/components/app/timetable";
 import WelcomeHeader from "@/components/app/welcome";
 
 export default async function HomePage() {
