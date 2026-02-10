@@ -13,20 +13,20 @@ import { Search } from "lucide-react";
 export default function AnnouncementsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   return (
-    <div className="flex flex-col justify-center items-center w-fit p-3 gap-3 mx-auto overflow-hidden">
-      <div className="flex flex-col justify-start w-full max-w-full gap-6">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-2xl font-semibold">Announcements</h1>
-          <div>
-            <InputGroup>
-              <InputGroupInput placeholder="Search announcements..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-              <InputGroupAddon><Search /></InputGroupAddon>
-              <InputGroupAddon align="inline-end">
-                <InputGroupButton variant="default"><Search /></InputGroupButton>
-              </InputGroupAddon>
-            </InputGroup>
-          </div>
+    <div className="flex flex-col justify-start items-center w-fit h-screen gap-0 mx-auto">
+      <div className="flex flex-col gap-2 sticky top-0 z-10 w-full p-3">
+        <h1 className="text-2xl font-semibold">Announcements</h1>
+        <div>
+          <InputGroup>
+            <InputGroupInput placeholder="Search announcements..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            <InputGroupAddon><Search /></InputGroupAddon>
+            <InputGroupAddon align="inline-end">
+              <InputGroupButton variant="default"><Search /></InputGroupButton>
+            </InputGroupAddon>
+          </InputGroup>
         </div>
+      </div>
+      <div className="flex flex-col justify-start w-full max-w-full gap-6 overflow-y-auto p-3 pt-0 flex-1">
         <div className="grid lg:grid-cols-2 2xl:grid-cols-3 gap-2">
           <AnnouncementCard
             id={1}
