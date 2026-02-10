@@ -83,7 +83,7 @@ function AppMenuBarInner() {
                   <AvatarFallback>{session?.data?.user.name != null ? session?.data?.user.name[0] : ""}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium text-black">{session?.data?.user.name}</span>
+                  <span className="truncate font-medium text-foreground">{session?.data?.user.name}</span>
                   <span className="truncate text-xs text-muted-foreground">{session?.data?.user.email}</span>
                 </div>
               </div>

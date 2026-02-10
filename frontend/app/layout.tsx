@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Poppins, Geist_Mono, Figtree } from "next/font/google";
 import "./globals.css";
 
+import { ThemeProvider } from "@/components/theme-provider";
+
 const figtree = Figtree({subsets:['latin'],variable:'--font-sans'});
 
 const poppins = Poppins({
@@ -26,11 +28,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={figtree.variable}>
+    <html lang="en" className={figtree.variable} suppressHydrationWarning>
       <body
         className={`${poppins.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
