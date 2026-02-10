@@ -55,7 +55,7 @@
       {
         "action": "replace",
         "for": "all-classes",
-        "with": "class-Exam"
+        "with": "no-class-Exam"
       }
     ]
   },
@@ -67,7 +67,7 @@
       {
         "action": "replace",
         "for": "all-classes",
-        "with": "class-Exam"
+        "with": "no-class-Exam"
       }
     ]
   },
@@ -92,7 +92,7 @@
       {
         "action": "replace",
         "for": "all-classes",
-        "with": "class-Exam"
+        "with": "no-class-Exam"
       }
     ]
   },
@@ -140,7 +140,7 @@
       {
         "action": "replace",
         "for": "all-classes",
-        "with": "class-Exam"
+        "with": "no-class-Exam"
       }
     ]
   },
@@ -152,7 +152,7 @@
       {
         "action": "replace",
         "for": "all-classes",
-        "with": "class-Exam"
+        "with": "no-class-Exam"
       }
     ]
   }
