@@ -33,7 +33,7 @@ export default function LoginPage() {
         </CardContent>
         <CardFooter className="inline text-muted-foreground">
           By signing in, Google will share your name, email address, and profile picture with Schooler.
-          Learn more about <Link href="/terms" className="text-black hover:underline">Terms of Service</Link> and <Link href="/privacy" className="text-black hover:underline">Privacy Policy</Link>.
+          Learn more about <Link href="/terms" className="text-foreground hover:underline">Terms of Service</Link> and <Link href="/privacy" className="text-foreground hover:underline">Privacy Policy</Link>.
         </CardFooter>
       </Card>
       <GradientBackground
