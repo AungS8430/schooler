@@ -107,7 +107,7 @@ function getCurrentSlot(slotsToCheck: Slot[], currentTime: string) {
   return null;
 }
 
-export default function Timetable() {
+export default function Timetable({ qClass, dynamic }: { qClass?: string; dynamic?: boolean }) {
   const [currentDay, setCurrentDay] = useState<number>(0);
   const [currentTime, setCurrentTime] = useState<string>("");
   const [dayColumnWidth, setDayColumnWidth] = useState<number>(112); // default 7rem
@@ -116,6 +116,7 @@ export default function Timetable() {
   const gridRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!dynamic) return;
     const update = () => {
       const now = new Date();
       setCurrentDay(now.getDay());
@@ -129,6 +130,7 @@ export default function Timetable() {
   }, []);
 
   useEffect(() => {
+    if (!dynamic) return;
     const measureWidth = () => {
       if (dayColumnRef.current && gridRef.current) {
         const dayWidth = dayColumnRef.current.offsetWidth;
@@ -157,6 +159,7 @@ export default function Timetable() {
   const currentSlotId = getCurrentSlot(usedSlots, currentTime);
 
   function getTimeProgressPercent() {
+    if (!dynamic || !currentSlotId) return null;
     const [curHour, curMin] = currentTime.split(":").map(Number);
     const curMinutes = curHour * 60 + curMin;
 
@@ -236,7 +239,7 @@ export default function Timetable() {
               cells.push(
                 <div
                   key={subject.id}
-                  className={`h-16 text-xs md:text-sm flex items-center justify-center text-center rounded-md p-4 shadow-md ${isCurrent ? "bg-primary text-primary-foreground" : currentDay == dayIdx ? "bg-primary/65 text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+                  className={`h-16 text-xs md:text-sm flex items-center justify-center text-center rounded-md p-4 shadow-md ${isCurrent ? "bg-primary text-primary-foreground" : currentDay == dayIdx ? "bg-primary/65 text-primary-foreground" : (dynamic ? "bg-muted text-muted-foreground" : "bg-secondary text-secondary-foreground")}`}
                   style={{ gridColumn: `span ${span}` }}
                 >
                   {subject.title}

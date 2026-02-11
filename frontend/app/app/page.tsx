@@ -13,7 +13,7 @@ export default async function HomePage() {
       <div className="flex flex-col justify-center overflow-hidden max-w-full">
         <div className="flex flex-col justify-center md:gap-6 overflow-hidden">
           <WelcomeHeader />
-          <Timetable />
+          <Timetable dynamic />
         </div>
 
         <div className="self-end">
@@ -21,7 +21,7 @@ export default async function HomePage() {
             <Link href="/app/calendar"><Calendar />View Academic Calendar</Link>
           </Button>
           <Button  variant="link" asChild>
-            <Link href="/app/timetable"><ChevronRight />View Full Timetable</Link>
+            <Link href="/app/schedule"><ChevronRight />View Class Schedule</Link>
           </Button>
         </div>
 
