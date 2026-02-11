@@ -1,6 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef} from "react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 type Slot = {
   id: string;
@@ -16,6 +24,8 @@ type Subject = {
   overlapsBreak?: boolean;
   isBreak?: boolean;
   isLunch?: boolean;
+  teacher?: string;
+  classroom?: string;
 }
 export const slots: Slot[] = [
   { id: 's1', start: '08:00', end: '08:10' },
@@ -61,13 +71,13 @@ export const timetable: { [day: number]: Subject[] } = {
     { id: 'calculus2', title: 'Calculus 2', slotIds: ['s2'] },
     { id: 'mathinfo', title: 'Mathematics for information Technology', slotIds: ['s3', 's4', 's5'] },
     { id: 'lunch', title: 'Lunch', slotIds: ['s6'], isLunch: true },
-    { id: 'labwork4', title: 'Lab work 4 for Basic Computer Engineering', slotIds: ['s7', 's8', 's9'] },
+    { id: 'labwork4', title: 'Lab work 4 for Basic Computer Engineering', slotIds: ['s7', 's8', 's9'], classroom: "Labwork 7 (EE)" },
     { id: 'classactivity', title: 'Class Activity / LHR', slotIds: ['s10'] },
   ],
   5: [
     { id: 'shr', title: 'SHR', slotIds: ['s1'] },
     { id: 'physics4', title: 'Physics 4', slotIds: ['s2', 's3'] },
-    { id: 'mathit', title: 'Mathematics for IT', slotIds: ['s4', 's5'], endsEarly: true },
+    { id: 'introcn', title: 'Intro. to Computer Network & Security', slotIds: ['s4', 's5'], classroom: "Labwork 6 (CE)" },
     { id: 'lunch', title: 'Lunch', slotIds: ['s6'], isLunch: true },
     { id: 'japanese4', title: 'Japanese 4', slotIds: ['s7', 's8'] },
     { id: 'thaiculture', title: 'Thai culture/Social study 1', slotIds: ['s9', 's10'] },
@@ -237,13 +247,34 @@ export default function Timetable({ qClass, dynamic }: { qClass?: string; dynami
               const span = subject.slotIds.filter(id => usedSlots.find(s => s.id === id)).length;
               const isCurrent = currentDay === dayIdx && subject.slotIds.includes(currentSlotId || "");
               cells.push(
-                <div
-                  key={subject.id}
-                  className={`h-16 text-xs md:text-sm flex items-center justify-center text-center rounded-md p-4 shadow-md ${isCurrent ? "bg-primary text-primary-foreground" : currentDay == dayIdx ? "bg-primary/65 text-primary-foreground" : (dynamic ? "bg-muted text-muted-foreground" : "bg-secondary text-secondary-foreground")}`}
-                  style={{ gridColumn: `span ${span}` }}
-                >
-                  {subject.title}
-                </div>
+                <Popover key={subject.id}>
+                  <PopoverTrigger asChild>
+                    <div
+                      className={`h-16 text-xs md:text-sm flex items-center justify-center text-center rounded-md p-4 shadow-md ${isCurrent ? "bg-primary text-primary-foreground" : currentDay == dayIdx ? "bg-primary/65 text-primary-foreground" : (dynamic ? "bg-muted text-muted-foreground" : "bg-secondary text-secondary-foreground")}`}
+                      style={{ gridColumn: `span ${span}` }}
+                    >
+                      {subject.title}
+                    </div>
+                  </PopoverTrigger>
+                  <PopoverContent>
+                    <PopoverHeader>
+                      <PopoverTitle>{subject.title}</PopoverTitle>
+                      <PopoverDescription>
+                        <span>Time: {subject.slotIds.map(id => {
+                          const slot = slots.find(s => s.id === id);
+                          return slot ? `${slot.start} - ${slot.end}` : "";
+                        }).join(", ")}</span>
+                        {subject.classroom && <span><br />Classroom: {subject.classroom}</span>}
+                        {subject.teacher && <span><br />Teacher: {subject.teacher}</span>}
+                        {subject.isLunch && <span><br />This is the lunch break.</span>}
+                        {subject.isBreak && <span><br />This is a break period.</span>}
+                        {subject.endsEarly && <span><br />This session ends early.</span>}
+                        {subject.overlapsBreak && <span><br />This session overlaps with a break.</span>}
+                      </PopoverDescription>
+                    </PopoverHeader>
+                  </PopoverContent>
+                </Popover>
+
               );
               slotIdx += span;
             } else {
