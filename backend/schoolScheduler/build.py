@@ -1,18 +1,17 @@
-import json
 from copy import deepcopy
 from dataclasses import asdict
-from datetime import datetime, timedelta
-from functools import cache
+from datetime import date, timedelta
 from typing import Any
 
 from schoolScheduler import datamodel
+from schoolScheduler.loader import loadEvent, loadSchedule, loadSpecial
 
 
-def converter(
+def convertTimetable(
     rawTimetable: tuple[list[dict[str, Any]], list[str]],
     hasSHR: bool | None = None,
     hasLunch: bool | None = None,
-) -> list[dict[str, Any]]:
+) -> tuple[list[dict[str, Any]], list[str]]:
     dayTimetable = rawTimetable[0]
     if len(rawTimetable[1]) != 0:
         hasSHR = False
@@ -61,30 +60,7 @@ def converter(
             output[-2].endsEarly = True
         lastTimeslot = timeslot + duration
     outFinal = [asdict(x) for x in output]
-    return outFinal
-
-
-@cache
-def loadSchedule():
-    with open("schoolScheduler/volumes/class.json") as file:
-        out = json.loads(file.read())
-    return out
-
-
-@cache
-def loadSpecial() -> list[dict[str, Any]]:
-    with open("schoolScheduler/volumes/special.json") as file:
-        out = json.loads(file.read())
-    return out
-
-
-@cache
-def loadEvent():
-    with open("schoolScheduler/volumes/override.json") as file:
-        out = json.loads(file.read())
-        for event in out:
-            event["date"] = datetime.strptime(event["date"], "%Y-%m-%d")
-    return out
+    return outFinal, rawTimetable[1]
 
 
 def checkRoom(room: datamodel.Room, cases: str):
@@ -106,18 +82,16 @@ def getSpecial(
     return [], "Error"
 
 
-def buildByDate(
-    room: datamodel.Room, date: datetime
-) -> tuple[list[dict[str, Any]], list]:
+def buildByDate(room: datamodel.Room, when: date) -> tuple[list[dict[str, Any]], list]:
     events = loadEvent()
     schedule = loadSchedule()
     selectedRoom = schedule[f"year{room.year}"][room.department][f"room{room.room}"][
-        datamodel.TIME_LOOKUP[date.isoweekday()]
+        datamodel.TIME_LOOKUP[when.isoweekday()]
     ]
     out: list = deepcopy(selectedRoom)
     actionDid = []
     for event in events:
-        if not event["date"] <= date <= event["date"] + timedelta(event["duration"]):
+        if not event["date"] <= when <= event["date"] + timedelta(event["duration"]):
             continue
         actions = event["actions"]
         for action in actions:
@@ -138,5 +112,25 @@ def buildByDate(
     return out, actionDid
 
 
-def dateToStartOFWeek(date: datetime):
-    return date - timedelta(days=date.weekday())
+def dateToStartOFWeek(when: date) -> date:
+    return when - timedelta(days=when.weekday())
+
+
+def weekSchedule(
+    room: datamodel.Room, when: date
+) -> tuple[dict[int, list[dict[str, Any]]], dict[int, list]]:
+    startDate = dateToStartOFWeek(when)
+    output = {}
+    outAction = {}
+    for diff in range(5):
+        eachDay = timedelta(days=diff) + startDate
+        tem = convertTimetable(buildByDate(room, eachDay))
+        output[diff + 1] = tem[0]
+        outAction[diff + 1] = tem[1]
+    return output, outAction
+
+
+def fixedWeekSchedule(
+    room: datamodel.Room,
+) -> tuple[dict[int, list[dict[str, Any]]], dict[int, list]]:
+    return weekSchedule(room, date(1970, 1, 1))
