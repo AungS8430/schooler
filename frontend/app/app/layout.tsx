@@ -15,7 +15,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     >
       <AppSidebar />
       <AppMenuBar />
-      <div className="flex-1 overflow-hidden mb-12 md:mb-0">
+      <div className="flex-1 overflow-hidden">
         <main>{children}</main>
       </div>
       <GradientBackground

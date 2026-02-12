@@ -204,7 +204,7 @@ export default function SchedulePage() {
           </Button>
         </div>
       </div>
-      <div ref={timetableRef} className="p-4 w-fit overflow-x-auto max-w-full">
+      <div ref={timetableRef} className="p-4 w-fit overflow-x-auto max-w-full mb-12 md:mb-0">
         <Timetable />
         <div className="w-full text-right pt-2 text-sm">Class schedule for {selectedClass}</div>
       </div>

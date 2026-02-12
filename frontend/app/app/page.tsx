@@ -9,7 +9,7 @@ import Link from "next/link";
 
 export default async function HomePage() {
   return (
-    <div className="flex flex-col justify-center items-center w-full max-w-5xl p-3 gap-3 md:px-3 md:py-7 md:gap-12 mx-auto overflow-hidden">
+    <div className="flex flex-col justify-center items-center w-full max-w-5xl p-3 gap-3 md:px-3 md:py-7 md:gap-12 mx-auto overflow-hidden mb-12 md:mb-0">
       <div className="flex flex-col justify-center overflow-hidden max-w-full">
         <div className="flex flex-col justify-center md:gap-6 overflow-hidden">
           <WelcomeHeader />

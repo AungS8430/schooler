@@ -26,7 +26,7 @@ export default function AnnouncementsPage() {
           </InputGroup>
         </div>
       </div>
-      <div className="flex flex-col justify-start w-full max-w-full gap-6 overflow-y-auto p-3 pt-0 flex-1">
+      <div className="flex flex-col justify-start w-full max-w-full gap-6 overflow-y-auto p-3 pt-0 flex-1 mb-12 md:mb-0">
         <div className="grid lg:grid-cols-2 2xl:grid-cols-3 gap-2">
           <AnnouncementCard
             id={1}
