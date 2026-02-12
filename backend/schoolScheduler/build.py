@@ -136,3 +136,7 @@ def buildByDate(
                 case _:
                     pass
     return out, actionDid
+
+
+def dateToStartOFWeek(date: datetime):
+    return date - timedelta(days=date.weekday())
