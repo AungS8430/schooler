@@ -3,7 +3,8 @@ from dataclasses import asdict
 from datetime import date, timedelta
 from typing import Any
 
-from schoolScheduler import datamodel
+from common import model
+from schoolScheduler import scheduleModel
 from schoolScheduler.loader import loadEvent, loadSchedule, loadSpecial
 
 
@@ -26,9 +27,9 @@ def convertTimetable(
         if timetable["id"] == "lunch":
             hasLunch = True
     dayTimetable.sort(key=lambda x: x["timeslot"])
-    output: list[datamodel.TimescheuleTS] = []
+    output: list[scheduleModel.TimescheuleTS] = []
     if hasSHR:
-        output.append(datamodel.TimescheuleTS("shr", "SHR", ["s1"]))
+        output.append(scheduleModel.TimescheuleTS("shr", "SHR", ["s1"]))
     passLunch = False
     lastTimeslot = 1
     for timetable in dayTimetable:
@@ -36,7 +37,7 @@ def convertTimetable(
         if hasLunch and timeslot > 4 and not passLunch:
             passLunch = True
             output.append(
-                datamodel.TimescheuleTS("lunch", "Lunch", ["s6"], isLunch=True)
+                scheduleModel.TimescheuleTS("lunch", "Lunch", ["s6"], isLunch=True)
             )
         if timetable["id"] == "shr" or timetable["id"] == "lunch":
             continue
@@ -45,7 +46,7 @@ def convertTimetable(
         id = timetable["id"]
         location = timetable["where"]
         output.append(
-            datamodel.TimescheuleTS(
+            scheduleModel.TimescheuleTS(
                 id=id,
                 title=title,
                 slotIDs=[
@@ -63,7 +64,7 @@ def convertTimetable(
     return outFinal, rawTimetable[1]
 
 
-def checkRoom(room: datamodel.Room, cases: str):
+def checkRoom(room: model.Room, cases: str):
     if cases == "all-classes":
         return True
     if cases == f"year{room.year}-de_{room.department}-room{room.room}":
@@ -74,7 +75,7 @@ def checkRoom(room: datamodel.Room, cases: str):
 def getSpecial(
     selectedRoom: dict[str, list[dict]], action: str
 ) -> tuple[list[dict], str]:
-    if action[0:6] == "class-" and action[6:] in datamodel.TIME_LOOKUP.values():
+    if action[0:6] == "class-" and action[6:] in scheduleModel.TIME_LOOKUP.values():
         return selectedRoom[action[6:]], "Normal"
     for special in loadSpecial():
         if special["class name"] == action:
@@ -82,11 +83,11 @@ def getSpecial(
     return [], "Error"
 
 
-def buildByDate(room: datamodel.Room, when: date) -> tuple[list[dict[str, Any]], list]:
+def buildByDate(room: model.Room, when: date) -> tuple[list[dict[str, Any]], list]:
     events = loadEvent()
     schedule = loadSchedule()
     selectedRoom = schedule[f"year{room.year}"][room.department][f"room{room.room}"][
-        datamodel.TIME_LOOKUP[when.isoweekday()]
+        scheduleModel.TIME_LOOKUP[when.isoweekday()]
     ]
     out: list = deepcopy(selectedRoom)
     actionDid = []
@@ -117,7 +118,7 @@ def dateToStartOFWeek(when: date) -> date:
 
 
 def weekSchedule(
-    room: datamodel.Room, when: date
+    room: model.Room, when: date
 ) -> tuple[dict[int, list[dict[str, Any]]], dict[int, list]]:
     startDate = dateToStartOFWeek(when)
     output = {}
@@ -131,6 +132,6 @@ def weekSchedule(
 
 
 def fixedWeekSchedule(
-    room: datamodel.Room,
+    room: model.Room,
 ) -> tuple[dict[int, list[dict[str, Any]]], dict[int, list]]:
     return weekSchedule(room, date(1970, 1, 1))

@@ -4,13 +4,6 @@ TIME_LOOKUP = {1: "Monday", 2: "Tuesday", 3: "Wednesday", 4: "Thursday", 5: "Fri
 
 
 @dataclass
-class Room:
-    year: int
-    department: str
-    room: int
-
-
-@dataclass
 class TimescheuleTS:
     id: str
     title: str

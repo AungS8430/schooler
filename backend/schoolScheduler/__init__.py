@@ -1,2 +1,1 @@
-from schoolScheduler.build import fixedWeekSchedule, weekSchedule
-from schoolScheduler.datamodel import Room
+from schoolScheduler.build import fixedWeekSchedule, weekSchedule  # noqa : F401
