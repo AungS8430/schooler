@@ -12,14 +12,12 @@ class Room:
 
 
 @dataclass
-class Timeslot:
-    begin: int
-    subject: str
-    duration: int
-    location: str
-
-
-@dataclass
-class Timeschedule:
-    date: datetime
-    schedule: list[Timeslot]
+class TimescheuleTS:
+    id: str
+    title: str
+    slotIDs: list[str]
+    location: str | None = None
+    endsEarly: bool = False
+    overlapsBreak: bool = False
+    isBreak: bool = False
+    isLunch: bool = False
