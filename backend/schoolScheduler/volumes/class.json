@@ -14,7 +14,7 @@
             "id": "chemistry3",
             "timeslot": 3,
             "subject": "Chemistry 3",
-            "teacher": "608",
+            "where": "608",
             "duration": 2
           },
           {
