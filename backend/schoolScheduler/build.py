@@ -3,7 +3,7 @@ from dataclasses import asdict
 from datetime import date, timedelta
 from typing import Any
 
-from common import checkTag, model
+from common import checkTagStrong, model
 from schoolScheduler import scheduleModel
 from schoolScheduler.loader import loadEvent, loadSchedule, loadSpecial
 
@@ -88,7 +88,7 @@ def buildByDate(room: model.Room, when: date) -> tuple[list[dict[str, Any]], lis
             continue
         actions = event["actions"]
         for action in actions:
-            if not checkTag(action["for"], room.toTag()):
+            if not checkTagStrong(action["for"], room.toTag()):
                 continue
             tem = getSpecial(
                 schedule[f"year{room.year}"][room.department][f"room{room.room}"],
