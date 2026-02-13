@@ -41,10 +41,10 @@ def convertTimetable(
             )
         if timetable["id"] == "shr" or timetable["id"] == "lunch":
             continue
-        title = timetable["subject"]
-        duration = timetable["duration"]
-        id = timetable["id"]
-        location = timetable["where"]
+        id = timetable.get("id", "")
+        title = timetable.get("subject", "")
+        duration = timetable.get("duration", 1)
+        location = timetable.get("where", "")
         output.append(
             scheduleModel.TimescheuleTS(
                 id=id,
