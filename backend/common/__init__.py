@@ -1,2 +1,8 @@
-from common.matching import check_tag_strong, check_tag_weak  # noqa : F401
-from common.model import Room, fromTag  # noqa : F401
+from common.matching import (  # noqa : F401
+    check_tag_strong,
+    check_tag_weak,
+    format_str_tags,
+    str_to_tags,
+    tags_to_str,
+)
+from common.model import Room, room_from_tag  # noqa : F401
