@@ -3,6 +3,8 @@
     "date": "2025-12-02",
     "duration": 1,
     "event": "Friday class",
+    "description": "Friday class schedule",
+    "type": "class",
     "actions": [
       {
         "action": "replace",
@@ -15,6 +17,8 @@
     "date": "2025-12-05",
     "duration": 1,
     "event": "No class",
+    "description": "No class schedule",
+    "type": "holiday",
     "actions": [
       {
         "action": "replace",
@@ -27,6 +31,8 @@
     "date": "2025-12-08",
     "duration": 1,
     "event": "Wednesday class",
+    "description": "Wednesday class schedule",
+    "type": "class",
     "actions": [
       {
         "action": "replace",
@@ -39,6 +45,8 @@
     "date": "2025-12-10",
     "duration": 1,
     "event": "No class",
+    "description": "No class schedule",
+    "type": "holiday",
     "actions": [
       {
         "action": "replace",
@@ -49,8 +57,10 @@
   },
   {
     "date": "2025-12-24",
-    "event": "Midterm Exam",
     "duration": 3,
+    "event": "Midterm Exam",
+    "description": "Midterm Exam schedule",
+    "type": "exam",
     "actions": [
       {
         "action": "replace",
@@ -61,8 +71,10 @@
   },
   {
     "date": "2025-12-29",
-    "event": "Midterm Exam",
     "duration": 2,
+    "event": "Midterm Exam",
+    "description": "Midterm Exam schedule",
+    "type": "exam",
     "actions": [
       {
         "action": "replace",
@@ -73,8 +85,10 @@
   },
   {
     "date": "2025-12-31",
-    "event": "New Year Holiday",
     "duration": 3,
+    "event": "New Year Holiday",
+    "description": "New Year Holiday schedule",
+    "type": "holiday",
     "actions": [
       {
         "replace": {
@@ -86,8 +100,10 @@
   },
   {
     "date": "2026-01-05",
-    "event": "Midterm Exam",
     "duration": 2,
+    "event": "Midterm Exam",
+    "description": "Midterm Exam schedule",
+    "type": "exam",
     "actions": [
       {
         "action": "replace",
@@ -98,8 +114,10 @@
   },
   {
     "date": "2026-01-08",
-    "event": "Tuesday class",
     "duration": 1,
+    "event": "Tuesday class",
+    "description": "Tuesday class schedule",
+    "type": "class",
     "actions": [
       {
         "action": "replace",
@@ -110,8 +128,10 @@
   },
   {
     "date": "2026-02-04",
-    "event": "Friday class",
     "duration": 1,
+    "event": "Friday class",
+    "description": "Friday class schedule",
+    "type": "class",
     "actions": [
       {
         "action": "replace",
@@ -122,8 +142,10 @@
   },
   {
     "date": "2026-03-03",
-    "event": "Friday class",
     "duration": 1,
+    "event": "Friday class",
+    "description": "Friday class schedule",
+    "type": "class",
     "actions": [
       {
         "action": "replace",
@@ -134,8 +156,10 @@
   },
   {
     "date": "2026-03-09",
-    "event": "Final Exam",
     "duration": 5,
+    "event": "Final Exam",
+    "description": "Final Exam schedule",
+    "type": "exam",
     "actions": [
       {
         "action": "replace",
@@ -146,8 +170,10 @@
   },
   {
     "date": "2026-03-16",
-    "event": "Final Exam",
     "duration": 2,
+    "event": "Final Exam",
+    "description": "Final Exam schedule",
+    "type": "exam",
     "actions": [
       {
         "action": "replace",
