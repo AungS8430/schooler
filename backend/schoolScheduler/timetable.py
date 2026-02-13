@@ -3,12 +3,12 @@ from dataclasses import asdict
 from datetime import date, timedelta
 from typing import Any
 
-from common import checkTagStrong, model
+from common import check_tag_Strong, model
 from schoolScheduler import scheduleModel
-from schoolScheduler.loader import loadEvent, loadSchedule, loadSpecial
+from schoolScheduler.loader import load_event, load_schedule, load_special
 
 
-def convertTimetable(
+def convert_timetable(
     rawTimetable: tuple[list[dict[str, Any]], list[str]],
     hasSHR: bool | None = None,
     hasLunch: bool | None = None,
@@ -64,20 +64,20 @@ def convertTimetable(
     return outFinal, rawTimetable[1]
 
 
-def getSpecial(
+def get_special(
     selectedRoom: dict[str, list[dict]], action: str
 ) -> tuple[list[dict], str]:
     if action[0:6] == "class-" and action[6:] in scheduleModel.TIME_LOOKUP.values():
         return selectedRoom[action[6:]], "Normal"
-    for special in loadSpecial():
+    for special in load_special():
         if special["class name"] == action:
             return special["schedule"], special["class name"]
     return [], "Error"
 
 
-def buildByDate(room: model.Room, when: date) -> tuple[list[dict[str, Any]], list]:
-    events = loadEvent()
-    schedule = loadSchedule()
+def build_by_date(room: model.Room, when: date) -> tuple[list[dict[str, Any]], list]:
+    events = load_event()
+    schedule = load_schedule()
     selectedRoom = schedule[f"year{room.year}"][room.department][f"room{room.room}"][
         scheduleModel.TIME_LOOKUP[when.isoweekday()]
     ]
@@ -88,9 +88,9 @@ def buildByDate(room: model.Room, when: date) -> tuple[list[dict[str, Any]], lis
             continue
         actions = event["actions"]
         for action in actions:
-            if not checkTagStrong(action["for"], room.toTag()):
+            if not check_tag_Strong(action["for"], room.toTag()):
                 continue
-            tem = getSpecial(
+            tem = get_special(
                 schedule[f"year{room.year}"][room.department][f"room{room.room}"],
                 action["with"],
             )
@@ -105,25 +105,25 @@ def buildByDate(room: model.Room, when: date) -> tuple[list[dict[str, Any]], lis
     return out, actionDid
 
 
-def dateToStartOFWeek(when: date) -> date:
+def date_to_start_of_week(when: date) -> date:
     return when - timedelta(days=when.weekday())
 
 
-def weekSchedule(
+def week_schedule(
     room: model.Room, when: date
 ) -> tuple[dict[int, list[dict[str, Any]]], dict[int, list]]:
-    startDate = dateToStartOFWeek(when)
+    startDate = date_to_start_of_week(when)
     output = {}
     outAction = {}
     for diff in range(5):
         eachDay = timedelta(days=diff) + startDate
-        tem = convertTimetable(buildByDate(room, eachDay))
+        tem = convert_timetable(build_by_date(room, eachDay))
         output[diff + 1] = tem[0]
         outAction[diff + 1] = tem[1]
     return output, outAction
 
 
-def fixedWeekSchedule(
+def fixed_week_schedule(
     room: model.Room,
 ) -> tuple[dict[int, list[dict[str, Any]]], dict[int, list]]:
-    return weekSchedule(room, date(1970, 1, 1))
+    return week_schedule(room, date(1970, 1, 1))

@@ -5,21 +5,21 @@ from typing import Any
 
 
 @cache
-def loadSchedule():
+def load_schedule():
     with open("schoolScheduler/volumes/class.json") as file:
         out = json.loads(file.read())
     return out
 
 
 @cache
-def loadSpecial() -> list[dict[str, Any]]:
+def load_special() -> list[dict[str, Any]]:
     with open("schoolScheduler/volumes/special.json") as file:
         out = json.loads(file.read())
     return out
 
 
 @cache
-def loadEvent():
+def load_event():
     with open("schoolScheduler/volumes/override.json") as file:
         out = json.loads(file.read())
         for event in out:
