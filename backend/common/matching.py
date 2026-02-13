@@ -1,4 +1,4 @@
-def checkTagStrong(sources: list[list[str]], target: list[str]) -> bool:
+def check_tag_Strong(sources: list[list[str]], target: list[str]) -> bool:
     output = False
     temTarget = set(target)
     for source in sources:
@@ -9,7 +9,7 @@ def checkTagStrong(sources: list[list[str]], target: list[str]) -> bool:
     return output
 
 
-def checkTagWeak(source: list[str], target: list[str]) -> bool:
+def check_tag_weak(source: list[str], target: list[str]) -> bool:
     output = False
     temTarget = set(target)
     temSource = set(source)

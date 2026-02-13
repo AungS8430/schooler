@@ -1,1 +1,1 @@
-from schoolScheduler.build import fixedWeekSchedule, weekSchedule  # noqa : F401
+from schoolScheduler.timetable import fixed_week_schedule, week_schedule  # noqa : F401
