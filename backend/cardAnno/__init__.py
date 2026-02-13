@@ -1,5 +1,4 @@
 from cardAnno.anno import (
-    check_permission_to_edit,  # noqa : F401
     delete_announcement,  # noqa : F401
     edit_announcement,  # noqa : F401
     fetch_user_announcements,  # noqa : F401
