@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+import { ScrollArea as ScrollAreaPrimitive } from "radix-ui";
 
 type ScrollGradientProps = {
   className?: string;
@@ -14,8 +15,7 @@ export default function ScrollGradient({
   scrollClassName,
   children,
 }: ScrollGradientProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const fadeSize = 24;
@@ -28,9 +28,8 @@ export default function ScrollGradient({
     : undefined;
 
   useEffect(() => {
-    const element = scrollRef.current;
-    const container = containerRef.current;
-    if (!element || !container) {
+    const element = viewportRef.current;
+    if (!element) {
       return;
     }
 
@@ -63,10 +62,16 @@ export default function ScrollGradient({
   }, []);
 
   return (
-    <div ref={containerRef} className={cn("relative", className)}>
-      <div
-        ref={scrollRef}
-        className={cn("overflow-x-auto", scrollClassName)}
+    <ScrollAreaPrimitive.Root
+      data-slot="scroll-area"
+      className={cn("relative", className)}
+    >
+      <ScrollAreaPrimitive.Viewport
+        ref={viewportRef}
+        data-slot="scroll-area-viewport"
+        className={cn(
+          "focus-visible:ring-ring/50 rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:outline-1"
+        )}
         style={
           maskImage
             ? ({
@@ -76,8 +81,24 @@ export default function ScrollGradient({
             : undefined
         }
       >
-        {children}
-      </div>
-    </div>
+        <div className={scrollClassName}>
+          {children}
+        </div>
+      </ScrollAreaPrimitive.Viewport>
+      <ScrollAreaPrimitive.ScrollAreaScrollbar
+        data-slot="scroll-area-scrollbar"
+        data-orientation="horizontal"
+        orientation="horizontal"
+        className={cn(
+          "data-horizontal:h-2.5 data-horizontal:flex-col data-horizontal:border-t data-horizontal:border-t-transparent data-vertical:h-full data-vertical:w-2.5 data-vertical:border-l data-vertical:border-l-transparent flex touch-none p-px transition-colors select-none"
+        )}
+      >
+        <ScrollAreaPrimitive.ScrollAreaThumb
+          data-slot="scroll-area-thumb"
+          className="rounded-full bg-border relative flex-1"
+        />
+      </ScrollAreaPrimitive.ScrollAreaScrollbar>
+      <ScrollAreaPrimitive.Corner />
+    </ScrollAreaPrimitive.Root>
   );
 }

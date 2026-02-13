@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { List, Users } from "lucide-react";
 import Link from "next/link";
 
@@ -64,26 +65,30 @@ export default function ClassesPage() {
           </Combobox>
         </div>
       </div>
-      <div className="p-4 w-full overflow-x-auto max-w-full mb-12 md:mb-0 flex flex-col gap-2">
-        {
-          classList.map((className) => (
-            <Card key={className} size="sm" className="bg-card/50">
-              <CardHeader>
-                <CardTitle>{className}</CardTitle>
-              </CardHeader>
-              <Separator />
-              <CardFooter>
-                <Button variant="link" size="sm" asChild>
-                  <Link href={`/app/schedule?class=${className}`}><List /> View Schedule</Link>
-                </Button>
-                <Button variant="link" size="sm" asChild>
-                  <Link href={`/app/students?class=${className}`}><Users /> View People</Link>
-                </Button>
-              </CardFooter>
-            </Card>
-          ))
-        }
-      </div>
+      <ScrollArea className="p-4 w-full overflow-auto max-w-full">
+        <div className="flex flex-col gap-2 mb-12 md:mb-0">
+          {
+            classList.map((className) => (
+              <Card key={className} size="sm" className="bg-card/50">
+                <CardHeader>
+                  <CardTitle>{className}</CardTitle>
+                </CardHeader>
+                <Separator />
+                <CardFooter>
+                  <Button variant="link" size="sm" asChild>
+                    <Link href={`/app/schedule?class=${className}`}><List /> View Schedule</Link>
+                  </Button>
+                  <Button variant="link" size="sm" asChild>
+                    <Link href={`/app/students?class=${className}`}><Users /> View People</Link>
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))
+          }
+        </div>
+
+        <ScrollBar />
+      </ScrollArea>
     </div>
   )
 }

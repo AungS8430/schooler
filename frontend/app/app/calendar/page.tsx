@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import { Button } from "@/components/ui/button";
-
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
   Popover,
   PopoverContent,
@@ -362,7 +362,7 @@ export default function CalendarPage() {
           </Button>
         </div>
       </div>
-      <div ref={calendarRef} className="p-4 w-fit overflow-x-auto max-w-full">
+      <ScrollArea ref={calendarRef} className="p-4 w-fit overflow-x-auto max-w-full">
         <div className="grid grid-cols-7 gap-1 text-sm font-semibold">
           {dayLabels.map((label) => (
             <div key={label} className="text-center p-2">
@@ -461,7 +461,8 @@ export default function CalendarPage() {
             );
           })}
         </div>
-      </div>
+        <ScrollBar />
+      </ScrollArea>
     </div>
   );
 }

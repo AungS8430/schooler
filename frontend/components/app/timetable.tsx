@@ -9,6 +9,7 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 type Slot = {
   id: string;
@@ -209,7 +210,7 @@ export default function Timetable({ qClass, dynamic }: { qClass?: string; dynami
   const progressPercent = getTimeProgressPercent();
 
   return (
-    <div className="overflow-auto w-fit max-w-full p-2">
+    <ScrollArea className="overflow-auto w-fit max-w-full p-2">
 
       <div className="relative">
         {progressPercent !== null && gridWidth > 0 && (
@@ -229,68 +230,69 @@ export default function Timetable({ qClass, dynamic }: { qClass?: string; dynami
           className="grid items-stretch gap-1"
           style={{ gridTemplateColumns: gridColumns }}
         >
-        <div ref={dayColumnRef} />
-        {usedSlots.map(slot => (
-          <div key={slot.id} className="text-xs md:text-sm font-bold flex items-center">
-            {slot.start}<br />- {slot.end}
-          </div>
-        ))}
-        {dayNames.map((dayName, dayIdx) => {
-          const subjectsForDay = timetable[dayIdx] || [];
-          if (subjectsForDay.length === 0) return null;
-          const cells = [];
-          let slotIdx = 0;
-          while (slotIdx < usedSlots.length) {
-            const subject = subjectsForDay.find(subj => subj.slotIds[0] === usedSlots[slotIdx].id);
-            if (subject) {
-              // Only count span for slots that are in usedSlots
-              const span = subject.slotIds.filter(id => usedSlots.find(s => s.id === id)).length;
-              const isCurrent = currentDay === dayIdx && subject.slotIds.includes(currentSlotId || "");
-              cells.push(
-                <Popover key={subject.id}>
-                  <PopoverTrigger asChild>
-                    <div
-                      className={`h-16 text-xs md:text-sm flex items-center justify-center text-center rounded-md p-4 shadow-md ${isCurrent ? "bg-primary text-primary-foreground" : currentDay == dayIdx ? "bg-primary/65 text-primary-foreground" : (dynamic ? "bg-muted text-muted-foreground" : "bg-secondary text-secondary-foreground")}`}
-                      style={{ gridColumn: `span ${span}` }}
-                    >
-                      {subject.title}
-                    </div>
-                  </PopoverTrigger>
-                  <PopoverContent>
-                    <PopoverHeader>
-                      <PopoverTitle>{subject.title}</PopoverTitle>
-                      <PopoverDescription>
-                        <span>Time: {subject.slotIds.map(id => {
-                          const slot = slots.find(s => s.id === id);
-                          return slot ? `${slot.start} - ${slot.end}` : "";
-                        }).join(", ")}</span>
-                        {subject.classroom && <span><br />Classroom: {subject.classroom}</span>}
-                        {subject.teacher && <span><br />Teacher: {subject.teacher}</span>}
-                        {subject.isLunch && <span><br />This is the lunch break.</span>}
-                        {subject.isBreak && <span><br />This is a break period.</span>}
-                        {subject.endsEarly && <span><br />This session ends early.</span>}
-                        {subject.overlapsBreak && <span><br />This session overlaps with a break.</span>}
-                      </PopoverDescription>
-                    </PopoverHeader>
-                  </PopoverContent>
-                </Popover>
+          <div ref={dayColumnRef} />
+          {usedSlots.map(slot => (
+            <div key={slot.id} className="text-xs md:text-sm font-bold flex items-center">
+              {slot.start}<br />- {slot.end}
+            </div>
+          ))}
+          {dayNames.map((dayName, dayIdx) => {
+            const subjectsForDay = timetable[dayIdx] || [];
+            if (subjectsForDay.length === 0) return null;
+            const cells = [];
+            let slotIdx = 0;
+            while (slotIdx < usedSlots.length) {
+              const subject = subjectsForDay.find(subj => subj.slotIds[0] === usedSlots[slotIdx].id);
+              if (subject) {
+                // Only count span for slots that are in usedSlots
+                const span = subject.slotIds.filter(id => usedSlots.find(s => s.id === id)).length;
+                const isCurrent = currentDay === dayIdx && subject.slotIds.includes(currentSlotId || "");
+                cells.push(
+                  <Popover key={subject.id}>
+                    <PopoverTrigger asChild>
+                      <div
+                        className={`h-16 text-xs md:text-sm flex items-center justify-center text-center rounded-md p-4 shadow-md ${isCurrent ? "bg-primary text-primary-foreground" : currentDay == dayIdx ? "bg-primary/65 text-primary-foreground" : (dynamic ? "bg-muted text-muted-foreground" : "bg-secondary text-secondary-foreground")}`}
+                        style={{ gridColumn: `span ${span}` }}
+                      >
+                        {subject.title}
+                      </div>
+                    </PopoverTrigger>
+                    <PopoverContent>
+                      <PopoverHeader>
+                        <PopoverTitle>{subject.title}</PopoverTitle>
+                        <PopoverDescription>
+                          <span>Time: {subject.slotIds.map(id => {
+                            const slot = slots.find(s => s.id === id);
+                            return slot ? `${slot.start} - ${slot.end}` : "";
+                          }).join(", ")}</span>
+                          {subject.classroom && <span><br />Classroom: {subject.classroom}</span>}
+                          {subject.teacher && <span><br />Teacher: {subject.teacher}</span>}
+                          {subject.isLunch && <span><br />This is the lunch break.</span>}
+                          {subject.isBreak && <span><br />This is a break period.</span>}
+                          {subject.endsEarly && <span><br />This session ends early.</span>}
+                          {subject.overlapsBreak && <span><br />This session overlaps with a break.</span>}
+                        </PopoverDescription>
+                      </PopoverHeader>
+                    </PopoverContent>
+                  </Popover>
 
-              );
-              slotIdx += span;
-            } else {
-              cells.push(
-                <div key={`empty-${dayIdx}-${slotIdx}`} className="px-2 py-1"></div>
-              );
-              slotIdx += 1;
+                );
+                slotIdx += span;
+              } else {
+                cells.push(
+                  <div key={`empty-${dayIdx}-${slotIdx}`} className="px-2 py-1"></div>
+                );
+                slotIdx += 1;
+              }
             }
-          }
-          return [
-            <div key={`day-${dayIdx}`} className="px-2 text-xs md:text-sm font-bold flex justify-end items-center">{dayName}</div>,
-            ...cells
-          ];
-        })}
+            return [
+              <div key={`day-${dayIdx}`} className="px-2 text-xs md:text-sm font-bold flex justify-end items-center">{dayName}</div>,
+              ...cells
+            ];
+          })}
+        </div>
       </div>
-      </div>
-    </div>
+      <ScrollBar orientation="horizontal" />
+    </ScrollArea>
   );
 }
