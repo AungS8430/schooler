@@ -6,7 +6,7 @@
     "actions": [
       {
         "action": "replace",
-        "for": "all-classes",
+        "for": [["all-classes"]],
         "with": "class-Friday"
       }
     ]
@@ -18,7 +18,7 @@
     "actions": [
       {
         "action": "replace",
-        "for": "all-classes",
+        "for": [["all-classes"]],
         "with": "no-class"
       }
     ]
@@ -30,7 +30,7 @@
     "actions": [
       {
         "action": "replace",
-        "for": "all-classes",
+        "for": [["all-classes"]],
         "with": "class-Wednesday"
       }
     ]
@@ -42,7 +42,7 @@
     "actions": [
       {
         "action": "replace",
-        "for": "all-classes",
+        "for": [["all-classes"]],
         "with": "no-class"
       }
     ]
@@ -54,7 +54,7 @@
     "actions": [
       {
         "action": "replace",
-        "for": "all-classes",
+        "for": [["all-classes"]],
         "with": "no-class-Exam"
       }
     ]
@@ -66,7 +66,7 @@
     "actions": [
       {
         "action": "replace",
-        "for": "all-classes",
+        "for": [["all-classes"]],
         "with": "no-class-Exam"
       }
     ]
@@ -78,7 +78,7 @@
     "actions": [
       {
         "replace": {
-          "for": "all-classes",
+          "for": [["all-classes"]],
           "with": "no-class"
         }
       }
@@ -91,7 +91,7 @@
     "actions": [
       {
         "action": "replace",
-        "for": "all-classes",
+        "for": [["all-classes"]],
         "with": "no-class-Exam"
       }
     ]
@@ -103,7 +103,7 @@
     "actions": [
       {
         "action": "replace",
-        "for": "all-classes",
+        "for": [["all-classes"]],
         "with": "class-Tuesday"
       }
     ]
@@ -115,7 +115,7 @@
     "actions": [
       {
         "action": "replace",
-        "for": "all-classes",
+        "for": [["all-classes"]],
         "with": "class-Friday"
       }
     ]
@@ -127,7 +127,7 @@
     "actions": [
       {
         "action": "replace",
-        "for": "all-classes",
+        "for": [["all-classes"]],
         "with": "class-Friday"
       }
     ]
@@ -139,7 +139,7 @@
     "actions": [
       {
         "action": "replace",
-        "for": "all-classes",
+        "for": [["all-classes"]],
         "with": "no-class-Exam"
       }
     ]
@@ -151,7 +151,7 @@
     "actions": [
       {
         "action": "replace",
-        "for": "all-classes",
+        "for": [["all-classes"]],
         "with": "no-class-Exam"
       }
     ]
