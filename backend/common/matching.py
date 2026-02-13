@@ -17,3 +17,19 @@ def check_tag_weak(source: list[str], target: list[str]) -> bool:
     if "all-classes" in temSource:
         output = True
     return output
+
+
+def str_to_tags(source: str) -> list[str]:
+    return source.split(",")
+
+
+def tags_to_str(source: list[str]) -> str:
+    tem = source.pop()
+    for x in source:
+        tem = f"{tem},{x}"
+    return tem
+
+
+def format_str_tags(source: str) -> str:
+    temstr = source.split()
+    return tags_to_str(temstr)

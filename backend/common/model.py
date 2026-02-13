@@ -13,7 +13,7 @@ class Room:
         return [f"year{self.year}", self.department, f"room{self.room}"]
 
 
-def fromTag(tags: list[str]) -> Room:
+def room_from_tag(tags: list[str]) -> Room:
     outRoom = Room(0, "None", 0)
     for tag in tags:
         if tag[:4] == "year":
