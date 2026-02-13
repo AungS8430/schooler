@@ -4,6 +4,6 @@ def checkTag(sources: list[list[str]], target: list[str]) -> bool:
     for source in sources:
         temSource = set(source)
         output = output or temSource > temTarget
-        if temSource.pop() == "all-classes":
+        if "all-classes" in temSource:
             output = True
     return output
