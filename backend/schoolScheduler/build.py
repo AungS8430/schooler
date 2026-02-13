@@ -3,7 +3,7 @@ from dataclasses import asdict
 from datetime import date, timedelta
 from typing import Any
 
-from common import model
+from common import checkTag, model
 from schoolScheduler import scheduleModel
 from schoolScheduler.loader import loadEvent, loadSchedule, loadSpecial
 
@@ -64,14 +64,6 @@ def convertTimetable(
     return outFinal, rawTimetable[1]
 
 
-def checkRoom(room: model.Room, cases: str):
-    if cases == "all-classes":
-        return True
-    if cases == f"year{room.year}-de_{room.department}-room{room.room}":
-        return True
-    return False
-
-
 def getSpecial(
     selectedRoom: dict[str, list[dict]], action: str
 ) -> tuple[list[dict], str]:
@@ -96,7 +88,7 @@ def buildByDate(room: model.Room, when: date) -> tuple[list[dict[str, Any]], lis
             continue
         actions = event["actions"]
         for action in actions:
-            if not checkRoom(room, action["for"]):
+            if not checkTag(action["for"], room.toTag()):
                 continue
             tem = getSpecial(
                 schedule[f"year{room.year}"][room.department][f"room{room.room}"],
