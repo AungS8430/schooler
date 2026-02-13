@@ -25,3 +25,10 @@ def load_event():
         for event in out:
             event["date"] = date.strptime(event["date"], "%Y-%m-%d")
     return out
+
+
+@cache
+def load_academic_info():
+    with open("schoolScheduler/volumes/academicInfo.json") as file:
+        out = json.loads(file.read())
+    return out

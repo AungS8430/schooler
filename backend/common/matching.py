@@ -1,4 +1,4 @@
-def check_tag_Strong(sources: list[list[str]], target: list[str]) -> bool:
+def check_tag_strong(sources: list[list[str]], target: list[str]) -> bool:
     output = False
     temTarget = set(target)
     for source in sources:
