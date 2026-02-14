@@ -14,17 +14,17 @@ export default function GradientBackground({
         <filter
           id="blurMain"
           filterUnits="userSpaceOnUse"
-          x="-200" y="-200" width="1600" height="1200"
+          x="-500" y="-500" width="2200" height="1800"
           colorInterpolationFilters="sRGB"
         >
-          <feGaussianBlur stdDeviation="90" />
+          <feGaussianBlur stdDeviation="90" in="SourceGraphic" />
         </filter>
 
         <filter id="grain">
           <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
           <feColorMatrix type="saturate" values="0" />
           <feComponentTransfer>
-            <feFuncA type="linear" slope="0.05" />
+            <feFuncA type="linear" slope="0.01" />
           </feComponentTransfer>
           <feBlend in="SourceGraphic" mode="overlay" />
         </filter>
@@ -56,7 +56,7 @@ export default function GradientBackground({
         <ellipse cx="600" cy="400" rx="450" ry="380" fill="url(#glow4)" opacity="0.85" />
       </g>
 
-      <rect width="1200" height="800" filter="url(#grain)" opacity="0.4" pointerEvents="none" />
+      <rect width="1200" height="800" filter="url(#grain)" opacity="0.1" pointerEvents="none" />
     </svg>
   );
 }
