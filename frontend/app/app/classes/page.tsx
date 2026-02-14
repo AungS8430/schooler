@@ -39,19 +39,13 @@ export default function ClassesPage() {
     }
   }, [selectedGrade, gradeList]);
 
-  const handleGradeChange = (value: string | null) => {
-    if (value) {
-      setSelectedGrade(value);
-    }
-  };
-
   return (
     <div className="flex flex-col justify-start items-center max-w-5xl w-full h-screen gap-0 mx-auto overflow-hidden">
       <div className="flex flex-col gap-2 sticky top-0 z-10 w-full p-3">
         <h1 className="text-2xl font-semibold">Classes</h1>
         <div className="flex gap-2 items-center w-full max-w-full">
-          <Combobox required items={gradeList} value={selectedGrade} onValueChange={handleGradeChange} autoHighlight>
-            <ComboboxInput placeholder="Select a class..." showClear={false} className="grow" />
+          <Combobox required items={gradeList} value={selectedGrade} onValueChange={(value) => setSelectedGrade(value || "")} autoHighlight>
+            <ComboboxInput placeholder="Select a class..." showClear className="grow" />
             <ComboboxContent>
               <ComboboxEmpty>No class found.</ComboboxEmpty>
               <ComboboxList>
