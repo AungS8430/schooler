@@ -27,10 +27,8 @@ import Link from "next/link";
 
 interface Person {
   id: number;
-  firstName: string;
-  lastName: string;
+  name: string;
   profilePicture?: string;
-  middleName?: string;
   nickname?: string;
   class?: string;
   department?: string;
@@ -42,9 +40,7 @@ interface Person {
 const samplePeople: Person[] = [
   {
     id: 1,
-    firstName: "John",
-    lastName: "Smith",
-    middleName: "Michael",
+    name: "John Michael Smith",
     nickname: "J.S.",
     class: "C2R1",
     department: "Science",
@@ -54,9 +50,7 @@ const samplePeople: Person[] = [
   },
   {
     id: 2,
-    firstName: "Emma",
-    lastName: "Johnson",
-    middleName: "Grace",
+    name: "Emma Grace Johnson",
     nickname: "Em",
     class: "C2R1",
     department: "Science",
@@ -66,8 +60,7 @@ const samplePeople: Person[] = [
   },
   {
     id: 3,
-    firstName: "Liam",
-    lastName: "Williams",
+    name: "Liam Williams",
     class: "C2R2",
     department: "Science",
     role: "Student",
@@ -76,9 +69,7 @@ const samplePeople: Person[] = [
   },
   {
     id: 4,
-    firstName: "Sophia",
-    lastName: "Brown",
-    middleName: "Rose",
+    name: "Sophia Rose Brown",
     nickname: "Sophie",
     class: "C2R2",
     department: "Science",
@@ -88,8 +79,7 @@ const samplePeople: Person[] = [
   },
   {
     id: 5,
-    firstName: "Noah",
-    lastName: "Davis",
+    name: "Noah Davis",
     class: "M2R1",
     department: "Mathematics",
     role: "Student",
@@ -98,9 +88,7 @@ const samplePeople: Person[] = [
   },
   {
     id: 6,
-    firstName: "Olivia",
-    lastName: "Miller",
-    middleName: "Charlotte",
+    name: "Olivia Charlotte Miller",
     class: "M2R1",
     department: "Mathematics",
     role: "Student",
@@ -109,8 +97,7 @@ const samplePeople: Person[] = [
   },
   {
     id: 7,
-    firstName: "Ethan",
-    lastName: "Wilson",
+    name: "Ethan Wilson",
     nickname: "E.W.",
     class: "M2R2",
     department: "Mathematics",
@@ -119,9 +106,7 @@ const samplePeople: Person[] = [
   },
   {
     id: 8,
-    firstName: "Ava",
-    lastName: "Moore",
-    middleName: "Elizabeth",
+    name: "Ava Elizabeth Moore",
     class: "M2R2",
     department: "Mathematics",
     role: "Student",
@@ -129,8 +114,7 @@ const samplePeople: Person[] = [
   },
   {
     id: 9,
-    firstName: "James",
-    lastName: "Taylor",
+    name: "James Taylor",
     class: "E2R1",
     department: "Engineering",
     role: "Student",
@@ -139,9 +123,7 @@ const samplePeople: Person[] = [
   },
   {
     id: 10,
-    firstName: "Isabella",
-    lastName: "Anderson",
-    middleName: "Marie",
+    name: "Isabella Marie Anderson",
     nickname: "Bella",
     class: "E2R1",
     department: "Engineering",
@@ -151,8 +133,7 @@ const samplePeople: Person[] = [
   },
   {
     id: 11,
-    firstName: "Benjamin",
-    lastName: "Thomas",
+    name: "Benjamin Thomas",
     class: "E2R2",
     department: "Engineering",
     role: "Student",
@@ -161,9 +142,7 @@ const samplePeople: Person[] = [
   },
   {
     id: 12,
-    firstName: "Mia",
-    lastName: "Jackson",
-    middleName: "Anne",
+    name: "Mia Anne Jackson",
     class: "E2R2",
     department: "Engineering",
     role: "Student",
@@ -172,9 +151,7 @@ const samplePeople: Person[] = [
   },
   {
     id: 13,
-    firstName: "Robert",
-    lastName: "Harris",
-    middleName: "James",
+    name: "Robert James Harris",
     role: "Teacher",
     department: "Science",
     email: "robert.harris@schooler.edu",
@@ -182,8 +159,7 @@ const samplePeople: Person[] = [
   },
   {
     id: 14,
-    firstName: "Sarah",
-    lastName: "Martin",
+    name: "Sarah Martin",
     role: "Teacher",
     department: "Mathematics",
     email: "sarah.martin@schooler.edu",
@@ -191,9 +167,7 @@ const samplePeople: Person[] = [
   },
   {
     id: 15,
-    firstName: "David",
-    lastName: "Garcia",
-    middleName: "Paul",
+    name: "David Paul Garcia",
     role: "Teacher",
     department: "Engineering",
     email: "david.garcia@schooler.edu",
@@ -265,14 +239,14 @@ export default function ClassesPage() {
                       <div className="flex flex-row gap-4">
                         <Avatar className="my-auto">
                           {person.profilePicture ? (
-                            <AvatarImage src={person.profilePicture} alt={`${person.firstName} ${person.lastName}'s profile picture`} />
+                            <AvatarImage src={person.profilePicture} alt={`${person.name}'s profile picture`} />
                           ) : (
-                            <AvatarFallback>{person.firstName.charAt(0)}{person.lastName.charAt(0)}</AvatarFallback>
+                            <AvatarFallback>{person.name.split(' ').map(n => n.charAt(0)).join('')}</AvatarFallback>
                           )}
                         </Avatar>
                         <div>
                           <div className="my-auto font-semibold">
-                            {person.firstName} {person.lastName} <span className="text-muted-foreground">{person.nickname}</span>
+                            {person.name} <span className="text-muted-foreground">{person.nickname}</span>
                           </div>
                           <div className="font-normal text-sm my-auto">
                             {person.role} | {person.department} Department {person.class && `| ${person.class}`}
@@ -304,13 +278,13 @@ export default function ClassesPage() {
                   <DialogHeader className="flex flex-row gap-4">
                     <Avatar className="my-auto">
                       {person.profilePicture ? (
-                        <AvatarImage src={person.profilePicture} alt={`${person.firstName} ${person.lastName}'s profile picture`} />
+                        <AvatarImage src={person.profilePicture} alt={`${person.name}'s profile picture`} />
                       ) : (
-                        <AvatarFallback>{person.firstName.charAt(0)}{person.lastName.charAt(0)}</AvatarFallback>
+                        <AvatarFallback>{person.name.split(' ').map(n => n.charAt(0)).join('')}</AvatarFallback>
                       )}
                     </Avatar>
                     <div className="my-auto flex flex-col justify-center">
-                      <DialogTitle>{person.firstName} {person.lastName}</DialogTitle>
+                      <DialogTitle>{person.name}</DialogTitle>
                       <DialogDescription>{person.nickname}</DialogDescription>
                     </div>
                   </DialogHeader>

@@ -100,14 +100,6 @@ function AppMenuBarInner() {
               ))}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem asChild>
-                <Link href="/app/profile">
-                  <User />
-                  Profile
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
             <DropdownMenuItem asChild>
               <Button variant="destructive" className="w-full justify-start" onClick={() => signOut()}>
                 <LogOut />

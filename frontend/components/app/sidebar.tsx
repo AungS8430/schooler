@@ -15,7 +15,6 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -24,7 +23,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import Logo from "@/components/icons/logo";
-import { User, LogOut, EllipsisVertical } from "lucide-react";
+import { LogOut, EllipsisVertical } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SessionProvider, useSession, signOut } from "next-auth/react";
@@ -136,14 +135,6 @@ function AppSidebarInner() {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator/>
-                <DropdownMenuGroup>
-                  <DropdownMenuItem asChild>
-                    <Link href="/app/profile">
-                      <User/>
-                      Profile
-                    </Link>
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
                 <DropdownMenuItem asChild>
                   <Button variant="destructive" className="w-full justify-start" onClick={() => signOut()}>
                     <LogOut />
