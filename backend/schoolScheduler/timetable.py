@@ -3,9 +3,10 @@ from dataclasses import asdict
 from datetime import date, timedelta
 from typing import Any
 
-from common import check_tag_strong, model
+from common import Room, check_tag_strong
+from custom_types import TIME_LOOKUP, TimeScheduleTS
 from schoolScheduler.loader import load_event, load_schedule, load_special
-from custom_types import TimeScheduleTS, TIME_LOOKUP
+
 
 def convert_timetable(
     rawTimetable: tuple[list[dict[str, Any]], list[str]],
@@ -35,9 +36,7 @@ def convert_timetable(
         timeslot = timetable["timeslot"]
         if hasLunch and timeslot > 4 and not passLunch:
             passLunch = True
-            output.append(
-                TimeScheduleTS("lunch", "Lunch", ["s6"], isLunch=True)
-            )
+            output.append(TimeScheduleTS("lunch", "Lunch", ["s6"], isLunch=True))
         if timetable["id"] == "shr" or timetable["id"] == "lunch":
             continue
         id = timetable.get("id", "")
@@ -74,7 +73,7 @@ def get_special(
     return [], "Error"
 
 
-def build_by_date(room: model.Room, when: date) -> tuple[list[dict[str, Any]], list]:
+def build_by_date(room: Room, when: date) -> tuple[list[dict[str, Any]], list]:
     events = load_event()
     schedule = load_schedule()
     selectedRoom = schedule[f"year{room.year}"][room.department][f"room{room.room}"][
@@ -109,7 +108,7 @@ def date_to_start_of_week(when: date) -> date:
 
 
 def week_schedule(
-    room: model.Room, when: date
+    room: Room, when: date
 ) -> tuple[dict[int, list[dict[str, Any]]], dict[int, list]]:
     startDate = date_to_start_of_week(when)
     output = {}
@@ -123,6 +122,6 @@ def week_schedule(
 
 
 def fixed_week_schedule(
-    room: model.Room,
+    room: Room,
 ) -> tuple[dict[int, list[dict[str, Any]]], dict[int, list]]:
     return week_schedule(room, date(1970, 1, 1))

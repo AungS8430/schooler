@@ -2,8 +2,8 @@ from sqlmodel import Session, select
 
 from common import check_tag_weak, tags_to_str
 from common.matching import str_to_tags
-from models import User
 from custom_types import RoleEnum
+from models import User
 
 
 def fetch_all_personnel(session: Session) -> list[User]:
@@ -12,9 +12,7 @@ def fetch_all_personnel(session: Session) -> list[User]:
     return [personnel for personnel in personnel_list]
 
 
-def fetch_personnel_by_personnelID(
-    session: Session, personnel_id: str
-) -> User | None:
+def fetch_personnel_by_personnelID(session: Session, personnel_id: str) -> User | None:
     statement = select(User).where(User.personnelID == personnel_id)
     personnel = session.exec(statement).first()
     return personnel
@@ -42,9 +40,7 @@ def edit_personnel(
 
 
 def fetch_by_tags(session: Session, tags: list[str]) -> list[User]:
-    statement = select(User).where(
-        check_tag_weak(str_to_tags(User.tags), tags)
-    )
+    statement = select(User).where(check_tag_weak(str_to_tags(User.tags), tags))
     personnel_list = session.exec(statement).all()
     return [personnel for personnel in personnel_list]
 
@@ -52,6 +48,6 @@ def fetch_by_tags(session: Session, tags: list[str]) -> list[User]:
 def check_permission_to_edit(
     personnel: User,
 ) -> bool:
-    if RoleEnum.ADMIN in personnel.tags:
+    if RoleEnum.ADMIN in str_to_tags(personnel.tags):
         return True
     return False
