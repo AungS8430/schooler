@@ -1,0 +1,56 @@
+from sqlmodel import Session, select
+
+from common import check_tag_weak, tags_to_str
+from common.matching import str_to_tags
+from personnel.personnelModel import Personnel, RoleEnum
+
+
+def fetch_all_personnel(session: Session) -> list[Personnel]:
+    statement = select(Personnel)
+    personnel_list = session.exec(statement).all()
+    return [personnel for personnel in personnel_list]
+
+
+def fetch_personnel_by_personnelID(
+    session: Session, personnel_id: str
+) -> Personnel | None:
+    statement = select(Personnel).where(Personnel.personnelID == personnel_id)
+    personnel = session.exec(statement).first()
+    return personnel
+
+
+def edit_personnel(
+    session: Session,
+    personnel_id: str,
+    name: str | None = None,
+    role: str | None = None,
+    tags: list[str] | None = None,
+) -> Personnel | None:
+    personnel = fetch_personnel_by_personnelID(session, personnel_id)
+    if personnel:
+        if name is not None:
+            personnel.name = name
+        if role is not None:
+            personnel.role = RoleEnum(role)
+        if tags is not None:
+            personnel.tags = tags_to_str(tags)
+        session.add(personnel)
+        session.commit()
+        session.refresh(personnel)
+    return personnel
+
+
+def fetch_by_tags(session: Session, tags: list[str]) -> list[Personnel]:
+    statement = select(Personnel).where(
+        check_tag_weak(str_to_tags(Personnel.tags), tags)
+    )
+    personnel_list = session.exec(statement).all()
+    return [personnel for personnel in personnel_list]
+
+
+def check_permission_to_edit(
+    personnel: Personnel,
+) -> bool:
+    if RoleEnum.ADMIN in personnel.tags:
+        return True
+    return False
