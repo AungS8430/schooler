@@ -48,6 +48,17 @@ def fetch_by_tags(session: Session, tags: list[str]) -> list[User]:
 def check_permission_to_edit(
     personnel: User,
 ) -> bool:
+    if personnel.role == RoleEnum.TEACHER:
+        return True
+    if personnel.role == RoleEnum.ADMIN:
+        return True
     if RoleEnum.ADMIN in str_to_tags(personnel.tags):
         return True
     return False
+
+
+def get_personnel_tags(session: Session, personnel_id: str) -> list[str] | None:
+    personnel = fetch_personnel_by_personnelID(session, personnel_id)
+    if personnel:
+        return str_to_tags(personnel.tags)
+    return None
