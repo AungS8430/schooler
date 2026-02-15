@@ -1,7 +1,10 @@
 from dataclasses import dataclass
+from datetime import date, timedelta
 from enum import Enum
 from typing import Optional
+
 from pydantic import BaseModel
+
 
 class OAuthUpsertIn(BaseModel):
     provider: str
@@ -11,12 +14,16 @@ class OAuthUpsertIn(BaseModel):
     image: Optional[str] = None
     tokens: Optional[dict] = None
 
+
 class RoleEnum(str, Enum):
     ADMIN = "admin"
     TEACHER = "teacher"
     STUDENT = "student"
 
+
 TIME_LOOKUP = {1: "Monday", 2: "Tuesday", 3: "Wednesday", 4: "Thursday", 5: "Friday"}
+DEPARTMENT = ["computer", "mechatronic", "electrical"]
+
 
 class OverrideType(Enum):
     CLASS = "class"
@@ -25,6 +32,7 @@ class OverrideType(Enum):
     EVENT = "event"
     OTHER = "other"
     BREAK = "break"
+
 
 @dataclass
 class TimeScheduleTS:
@@ -37,7 +45,6 @@ class TimeScheduleTS:
     isBreak: bool = False
     isLunch: bool = False
 
-DEPARTMENT = ["computer", "mechatronic", "electrical"]
 
 @dataclass
 class Room:
@@ -47,6 +54,7 @@ class Room:
 
     def toTag(self) -> list[str]:
         return [f"year{self.year}", self.department, f"room{self.room}"]
+
 
 def room_from_tag(tags: list[str]) -> Room:
     outRoom = Room(0, "None", 0)
@@ -60,3 +68,37 @@ def room_from_tag(tags: list[str]) -> Room:
         if tag[:4] == "room":
             outRoom.room = int(tag[4:])
     return outRoom
+
+
+@dataclass
+class Event:
+    id: int
+    type: OverrideType
+    title: str
+    date: date
+    duration: int
+    description: Optional[str] = None
+
+    def convert(self) -> dict:
+        return {
+            "id": self.id,
+            "type": self.type.value,
+            "title": self.title,
+            "start": self.date,
+            "end": self.date + timedelta(days=self.duration),
+            "description": self.description,
+        }
+
+
+@dataclass
+class Calendar:
+    events: list[dict]
+    start: str
+    end: str
+
+    def convert(self) -> dict:
+        return {
+            "events": self.events,
+            "start": self.start,
+            "end": self.end,
+        }
