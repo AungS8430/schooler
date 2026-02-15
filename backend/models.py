@@ -23,6 +23,8 @@ class User(SQLModel, table=True):
     personnelID: Optional[str] = None
     tags: Optional[str] = None
     role: Optional[RoleEnum] = None
+    department: Optional[str] = None
+    class_: Optional[str] = None
     name: Optional[str] = None
     image: Optional[str] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)

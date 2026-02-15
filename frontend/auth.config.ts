@@ -70,17 +70,51 @@ export const authConfig = {
         return false;
       }
     },
+    async jwt({ token, user, account, profile }) {
+      if (account && profile) {
+        try {
+          const res = await fetch(`${process.env.API_BASE}/internal/oauth/upsert`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-internal-secret": process.env.INTERNAL_API_SECRET!,
+            },
+            body: JSON.stringify({
+              provider: account.provider,
+              provider_account_id: account.providerAccountId ?? account.id,
+              email: profile.email,
+              name: profile.name,
+              image: profile.picture,
+              tokens: {
+                access_token: account.access_token,
+                refresh_token: account.refresh_token,
+                expires_at: account.expires_at,
+                scope: account.scope,
+              },
+            }),
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            token.sub = String(data.id);
+          } else {
+            console.error("upsert failed:", res.status);
+          }
+        } catch (err) {
+          console.error("upsert request failed:", err);
+        }
+      }
+
+      return token;
+    },
+
     async session({ session, token }) {
       if (token.sub) {
         session.user.id = token.sub;
+      } else if (token.id) {
+        session.user.id = String(token.id);
       }
       return session;
-    },
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-      }
-      return token;
     },
     authorized({ auth, request: { nextUrl }}) {
       const isLoggedIn = !!auth;
