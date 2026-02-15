@@ -1,6 +1,6 @@
 from sqlmodel import Session, or_, select
 
-from cardAnno.cardModel import Announcement
+from models import Announcement
 from common import check_tag_weak, format_str_tags, str_to_tags
 
 

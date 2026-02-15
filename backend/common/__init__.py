@@ -5,4 +5,4 @@ from common.matching import (  # noqa : F401
     str_to_tags,
     tags_to_str,
 )
-from common.model import Room, room_from_tag  # noqa : F401
+from custom_types import Room, room_from_tag

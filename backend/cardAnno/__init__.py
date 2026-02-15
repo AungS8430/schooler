@@ -5,4 +5,4 @@ from cardAnno.anno import (
     get_announcement_by_ID,  # noqa : F401
     post_announcement,  # noqa : F401
 )
-from cardAnno.cardModel import Announcement  # noqa : F401
+from models import Announcement

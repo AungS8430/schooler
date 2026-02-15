@@ -1,20 +1,23 @@
 import logging
 from contextlib import asynccontextmanager
 from os import getenv
-from typing import Annotated
+from typing import Annotated, Optional
 
 from dotenv import load_dotenv
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI, Depends, Header, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_nextauth_jwt import NextAuthJWT
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
-from cardAnno import (
-    Announcement,
+from custom_types import OAuthUpsertIn
+
+from user.auth import upsert_user_from_oauth, OAuthAccountConflict
+from cardAnno.anno import (
     delete_announcement,
     fetch_user_announcements,
     post_announcement,
 )
+from models import Announcement
 
 logger = logging.getLogger("uvicorn.error")
 logger.setLevel(logging.INFO)
@@ -46,6 +49,9 @@ if DB_PORT is None:
 DB_NAME = getenv("DB_NAME")
 if DB_NAME is None:
     raise Exception("DB_NAME Not found.")
+INTERNAL_API_SECRET = getenv("INTERNAL_API_SECRET")
+if INTERNAL_API_SECRET is None:
+    logger.warning("INTERNAL_API_SECRET Not found.")
 
 
 # config Database
@@ -122,6 +128,36 @@ async def getDBHealthCheck():
     except Exception as e:
         # Return the error detail to help debugging (suitable for internal use)
         return {"status": "unhealthy", "detail": str(e)}
+
+@app.post("/internal/oauth/upsert", status_code=status.HTTP_200_OK)
+def oauth_upsert(
+        payload: OAuthUpsertIn,
+        x_internal_secret: Optional[str] = Header(None),
+        session: Session = Depends(get_session),
+):
+    """
+    Internal endpoint called server-side (NextAuth signIn callback) to upsert a User and OAuthAccount.
+
+    Protected by X-Internal-Secret header. Returns 409 Conflict if the provider account is already
+    linked to a different user.
+    """
+    if not INTERNAL_API_SECRET or x_internal_secret != INTERNAL_API_SECRET:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+
+    try:
+        user = upsert_user_from_oauth(
+            session=session,
+            provider=payload.provider,
+            provider_account_id=payload.provider_account_id,
+            email=payload.email,
+            name=payload.name,
+            image=payload.image,
+            tokens=payload.tokens,
+        )
+    except OAuthAccountConflict as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc))
+
+    return {"id": user.id, "email": user.email}
 
 
 @app.get("/announcements")

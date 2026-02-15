@@ -19,12 +19,56 @@ export const authConfig = {
   },
   callbacks: {
     // Enforce allowed domain and verified email
-    async signIn({ profile }) {
+    async signIn({ account, profile }) {
       const email = profile?.email as string | undefined;
       if (!email) return false;
       const domain = email.split("@")[1]?.toLowerCase();
       const allowed = (process.env.ALLOWED_DOMAIN || "example.com").toLowerCase();
-      return !!(domain === allowed && profile?.email_verified);
+      if (!(!!(domain === allowed && profile?.email_verified)) || !account) {
+        return false;
+      }
+      try {
+        const res = await fetch(`${process.env.API_BASE ?? process.env.NEXT_PUBLIC_API_BASE}/internal/oauth/upsert`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            // INTERNAL_API_SECRET must NOT be exposed to the browser; this code runs server-side
+            "x-internal-secret": process.env.INTERNAL_API_SECRET!,
+          },
+          body: JSON.stringify({
+            provider: account.provider,
+            provider_account_id: account.providerAccountId ?? account.id,
+            email: profile.email,
+            name: profile.name,
+            image: profile.picture,
+            tokens: {
+              access_token: account.access_token,
+              refresh_token: account.refresh_token,
+              expires_at: account.expires_at,
+              scope: account.scope,
+            },
+          }),
+        });
+
+        if (res.status === 409) {
+          // OAuth account is already linked to a different user.
+          // Return false to deny sign-in (NextAuth will redirect to signIn page with an error).
+          return false;
+          // Alternatively you can return a URL (string) to redirect to a custom "link-error" page:
+          // return "/link-error";
+        }
+
+        if (!res.ok) {
+          // Upsert failed for other reasons; deny sign-in
+          return false;
+        }
+
+        // Success: allow sign-in
+        return true;
+      } catch (err) {
+        console.error("upsert failed", err);
+        return false;
+      }
     },
     async session({ session, token }) {
       if (token.sub) {

@@ -4,9 +4,8 @@ from datetime import date, timedelta
 from typing import Any
 
 from common import check_tag_strong, model
-from schoolScheduler import scheduleModel
 from schoolScheduler.loader import load_event, load_schedule, load_special
-
+from custom_types import TimeScheduleTS, TIME_LOOKUP
 
 def convert_timetable(
     rawTimetable: tuple[list[dict[str, Any]], list[str]],
@@ -27,9 +26,9 @@ def convert_timetable(
         if timetable["id"] == "lunch":
             hasLunch = True
     dayTimetable.sort(key=lambda x: x["timeslot"])
-    output: list[scheduleModel.TimescheuleTS] = []
+    output: list[TimeScheduleTS] = []
     if hasSHR:
-        output.append(scheduleModel.TimescheuleTS("shr", "SHR", ["s1"]))
+        output.append(TimeScheduleTS("shr", "SHR", ["s1"]))
     passLunch = False
     lastTimeslot = 1
     for timetable in dayTimetable:
@@ -37,7 +36,7 @@ def convert_timetable(
         if hasLunch and timeslot > 4 and not passLunch:
             passLunch = True
             output.append(
-                scheduleModel.TimescheuleTS("lunch", "Lunch", ["s6"], isLunch=True)
+                TimeScheduleTS("lunch", "Lunch", ["s6"], isLunch=True)
             )
         if timetable["id"] == "shr" or timetable["id"] == "lunch":
             continue
@@ -46,7 +45,7 @@ def convert_timetable(
         duration = timetable.get("duration", 1)
         location = timetable.get("where", "")
         output.append(
-            scheduleModel.TimescheuleTS(
+            TimeScheduleTS(
                 id=id,
                 title=title,
                 slotIDs=[
@@ -67,7 +66,7 @@ def convert_timetable(
 def get_special(
     selectedRoom: dict[str, list[dict]], action: str
 ) -> tuple[list[dict], str]:
-    if action[0:6] == "class-" and action[6:] in scheduleModel.TIME_LOOKUP.values():
+    if action[0:6] == "class-" and action[6:] in TIME_LOOKUP.values():
         return selectedRoom[action[6:]], "Normal"
     for special in load_special():
         if special["class name"] == action:
@@ -79,7 +78,7 @@ def build_by_date(room: model.Room, when: date) -> tuple[list[dict[str, Any]], l
     events = load_event()
     schedule = load_schedule()
     selectedRoom = schedule[f"year{room.year}"][room.department][f"room{room.room}"][
-        scheduleModel.TIME_LOOKUP[when.isoweekday()]
+        TIME_LOOKUP[when.isoweekday()]
     ]
     out: list = deepcopy(selectedRoom)
     actionDid = []

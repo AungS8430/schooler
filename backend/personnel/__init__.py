@@ -5,4 +5,5 @@ from personnel.personnel import (
     fetch_by_tags,  # noqa : F401
     fetch_personnel_by_personnelID,  # noqa : F401
 )
-from personnel.personnelModel import Personnel, RoleEnum  # noqa : F401
+from models import User
+from custom_types import RoleEnum
