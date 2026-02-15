@@ -9,6 +9,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_nextauth_jwt import NextAuthJWT
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
+from cardAnno import (
+    Announcement,
+    delete_announcement,
+    fetch_user_announcements,
+    post_announcement,
+)
+
 logger = logging.getLogger("uvicorn.error")
 logger.setLevel(logging.INFO)
 
@@ -43,7 +50,10 @@ if DB_NAME is None:
 
 # config Database
 DB_URL = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-connect_args = {"check_same_thread": False}
+# Only set sqlite-specific connect args when using a SQLite database URL
+connect_args = {}
+if DB_URL.startswith("sqlite"):
+    connect_args = {"check_same_thread": False}
 
 # init Database
 engine = create_engine(DB_URL, connect_args=connect_args)
@@ -112,3 +122,47 @@ async def getDBHealthCheck():
     except Exception as e:
         # Return the error detail to help debugging (suitable for internal use)
         return {"status": "unhealthy", "detail": str(e)}
+
+
+@app.get("/announcements")
+def read_announcements(session: Session = Depends(get_session)):
+
+    announcement_ids = fetch_user_announcements(session, ["all-users"])
+    return {"announcement_ids": announcement_ids}
+
+
+@app.post("/postAnnouncement")
+def create_announcement(
+    title: str,
+    description: str,
+    thumbnail: str | None,
+    authorName: str,
+    authorImage: str | None,
+    date: str,
+    target: str,
+    priority: int,
+    session: Session = Depends(get_session),
+):
+
+    new_announcement = post_announcement(
+        session=session,
+        title=title,
+        description=description,
+        thumbnail=thumbnail,
+        authorName=authorName,
+        authorImage=authorImage,
+        date=date,
+        target=target,
+        priority=priority,
+    )
+    return {"announcement": new_announcement}
+
+
+@app.delete("/deleteAnnouncement/{announcement_id}")
+def remove_announcement(
+    announcement_id: int,
+    session: Session = Depends(get_session),
+):
+
+    delete_announcement(session, announcement_id)
+    return {"detail": "Announcement deleted successfully."}
