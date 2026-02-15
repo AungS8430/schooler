@@ -22,7 +22,9 @@ class RoleEnum(str, Enum):
 
 
 TIME_LOOKUP = {1: "Monday", 2: "Tuesday", 3: "Wednesday", 4: "Thursday", 5: "Friday"}
+GRADE = ["year1", "year2", "year3", "year4", "year5"]
 DEPARTMENT = ["computer", "mechatronic", "electrical"]
+ROOM = [f"room{x}" for x in range(1, 11)]
 
 
 class OverrideType(Enum):
