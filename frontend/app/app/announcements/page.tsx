@@ -6,10 +6,11 @@ import AnnouncementCard from "@/components/app/announcement-card";
 import {
   InputGroup,
   InputGroupAddon,
-  InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { Search, Plus } from "lucide-react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 interface Announcement {
@@ -21,7 +22,6 @@ interface Announcement {
   authorName: string;
   authorImage?: string;
   date: string;
-  target: string;
   priority: number;
 }
 
@@ -75,12 +75,18 @@ export default function AnnouncementsPage() {
     <div className="flex flex-col justify-start items-center w-fit h-screen gap-0 mx-auto">
       <div className="flex flex-col gap-2 sticky top-0 z-10 w-full p-3">
         <h1 className="text-2xl font-semibold">Announcements</h1>
-        <div>
+        <div className="flex flex-row gap-2 w-full">
           <InputGroup>
             <InputGroupInput placeholder="Search announcements..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-            <InputGroupAddon onClick={() => fetchAnnouncementIds()}><Search /></InputGroupAddon>
+            <InputGroupAddon align="inline-end"><Search /></InputGroupAddon>
           </InputGroup>
-
+          {
+            (perms.role === "teacher" || perms.role === "admin") && (
+              <Link href="/app/announcements/create">
+                <Button size="icon"><Plus /></Button>
+              </Link>
+            )
+          }
         </div>
       </div>
       <ScrollArea className="flex flex-col justify-start w-full max-w-full gap-6 overflow-y-auto p-3 pt-0 flex-1 mb-12 md:mb-0">
@@ -98,7 +104,6 @@ export default function AnnouncementsPage() {
                     thumbnail={announcement.thumbnail}
                     author={{name: announcement.authorName, image: announcement.authorImage || ""}}
                     date={announcement.date}
-                    target={announcement.target}
                     priority={announcement.priority}
                   />
                 )

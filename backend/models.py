@@ -2,7 +2,6 @@ from sqlmodel import Field, SQLModel, Relationship
 from typing import Optional, List
 from datetime import datetime
 from custom_types import RoleEnum
-import random
 
 
 class OAuthAccount(SQLModel, table=True):
@@ -34,12 +33,14 @@ class User(SQLModel, table=True):
     announcements: List["Announcement"] = Relationship(back_populates="author")
 
 class Announcement(SQLModel, table=True):
-    id: int = Field(default=random.randint(1, 1000000), primary_key=True)
+    id: Optional[int] = Field(default=None, primary_key=True)
     title: str
     description: str
+    content: Optional[str]
     thumbnail: Optional[str] = None
     author_id: str = Field(foreign_key="user.id")
     author: "User" = Relationship(back_populates="announcements")
     date: str
-    target: str
     priority: int
+
+

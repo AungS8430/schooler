@@ -110,10 +110,18 @@ class AnnouncementReturn:
     id: int
     title: str
     description: str
+    content: Optional[str]
     thumbnail: Optional[str]
     author_id: str
     authorName: str
     authorImage: Optional[str]
     date: str
-    target: str
+    priority: int
+
+
+class AnnouncementCreate(BaseModel):
+    title: str
+    description: str
+    content: Optional[str] = None
+    thumbnail: Optional[str] = None
     priority: int

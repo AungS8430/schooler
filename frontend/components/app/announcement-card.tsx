@@ -20,11 +20,10 @@ interface AnnouncementCardProps {
   thumbnail?: string;
   author: { name: string; image: string};
   date: string;
-  target: string;
   priority: number;
 }
 
-export default function AnnouncementCard({ id, title, description, thumbnail, author, date, target, priority }: AnnouncementCardProps) {
+export default function AnnouncementCard({ id, title, description, thumbnail, author, date, priority }: AnnouncementCardProps) {
   return (
     <Card className="w-88 max-h-120 shrink-0">
       {
@@ -53,9 +52,6 @@ export default function AnnouncementCard({ id, title, description, thumbnail, au
               <span className="font-medium">{author.name}</span>
               <span className="text-xs text-muted-foreground">{new Date(date).toLocaleDateString()}</span>
             </div>
-          </div>
-          <div>
-            <span className="text-sm text-muted-foreground">To: {target}</span>
           </div>
         </div>
 

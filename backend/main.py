@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 from contextlib import asynccontextmanager
 from os import getenv
 from typing import Annotated, Optional
@@ -9,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_nextauth_jwt import NextAuthJWT
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
-from custom_types import OAuthUpsertIn
+from custom_types import OAuthUpsertIn, AnnouncementCreate
 
 from user.auth import upsert_user_from_oauth, get_user_perms, OAuthAccountConflict
 from cardAnno.anno import (
@@ -177,8 +178,7 @@ def read_announcements(jwt: Annotated[dict, Depends(JWT)], session: Session = De
     if not user_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid JWT: missing sub claim")
 
-    permissions = get_user_perms(session, user_id)
-    announcement_ids = fetch_user_announcements(session, ["all-users", permissions.get("class"), permissions.get("department")], query)
+    announcement_ids = fetch_user_announcements(session, query)
     return {"announcement_ids": announcement_ids}
 
 @app.get("/announcements/{announcement_id}")
@@ -189,37 +189,30 @@ def read_announcement(announcement_id: int, jwt: Annotated[dict, Depends(JWT)], 
     announcement = get_announcement_by_ID(session, announcement_id)
     if not announcement:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Announcement not found")
-    if not any(tag in ["all-users", get_user_perms(session, user_id).get("permissions").get("class"), get_user_perms(session, user_id).get("permissions").get("department")] for tag in announcement.target.split(",")):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden: You do not have access to this announcement")
     return {"announcement": announcement}
 
 
 @app.post("/announcements")
 def create_announcement(
-    title: str,
-    description: str,
-    thumbnail: str | None,
-    date: str,
-    target: str,
-    priority: int,
+    announcement_data: AnnouncementCreate,
     jwt: Annotated[dict, Depends(JWT)],
     session: Session = Depends(get_session),
 ):
     user_id = jwt.get("sub")
     if not user_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid JWT: missing sub claim")
-    permissions = get_user_perms(session, user_id).get("permissions")
+    permissions = get_user_perms(session, user_id)
     if not permissions.get("role") or permissions.get("role") not in ["admin", "teacher"]:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden: You do not have permission to create announcements")
     new_announcement = post_announcement(
         session=session,
-        title=title,
-        description=description,
-        thumbnail=thumbnail,
+        title=announcement_data.title,
+        description=announcement_data.description,
+        content=announcement_data.content,
+        thumbnail=announcement_data.thumbnail,
         author_id=user_id,
-        date=date,
-        target=target,
-        priority=priority,
+        date=datetime.now().isoformat(),
+        priority=announcement_data.priority,
     )
     return {"announcement": new_announcement}
 
@@ -227,10 +220,14 @@ def create_announcement(
 @app.delete("/announcements/{announcement_id}")
 def remove_announcement(
     announcement_id: int,
+    jwt: Annotated[dict, Depends(JWT)],
     session: Session = Depends(get_session),
 ):
+    user_id = jwt.get("sub")
+    if not user_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid JWT: missing sub claim")
 
-    delete_announcement(session, announcement_id)
+    delete_announcement(session, announcement_id, user_id)
     return {"detail": "Announcement deleted successfully."}
 
 @app.patch("/announcements/{announcement_id}")
@@ -239,9 +236,9 @@ def update_announcement(
     jwt: Annotated[dict, Depends(JWT)],
     title: str | None = None,
     description: str | None = None,
+    content: str | None = None,
     thumbnail: str | None = None,
     date: str | None = None,
-    target: str | None = None,
     priority: int | None = None,
     session: Session = Depends(get_session),
 ):
@@ -260,10 +257,10 @@ def update_announcement(
         announcement_id=announcement_id,
         title=title,
         description=description,
+        content=content,
         thumbnail=thumbnail,
         user_id=user_id,
         date=date,
-        target=target,
         priority=priority,
     )
     if not updated_announcement:
