@@ -11,7 +11,7 @@ from sqlmodel import Field, Session, SQLModel, create_engine, select
 
 from custom_types import OAuthUpsertIn
 
-from user.auth import upsert_user_from_oauth, OAuthAccountConflict
+from user.auth import upsert_user_from_oauth, get_user_perms, OAuthAccountConflict
 from cardAnno.anno import (
     delete_announcement,
     fetch_user_announcements,
@@ -158,6 +158,15 @@ def oauth_upsert(
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc))
 
     return {"id": user.id, "email": user.email}
+
+@app.get("/permissions")
+def read_permissions(jwt: Annotated[dict, Depends(JWT)], session: Session = Depends(get_session)):
+    user_id = jwt.get("sub")
+    if not user_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid JWT: missing sub claim")
+
+    permissions = get_user_perms(session, user_id)
+    return {"permissions": permissions}
 
 
 @app.get("/announcements")
