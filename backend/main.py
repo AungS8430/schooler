@@ -93,7 +93,7 @@ app = FastAPI(lifespan=lifespan)
 
 
 # config CORS
-origins = []
+origins = ["http://localhost:3000"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -172,13 +172,13 @@ def read_permissions(jwt: Annotated[dict, Depends(JWT)], session: Session = Depe
 
 
 @app.get("/announcements")
-def read_announcements(jwt: Annotated[dict, Depends(JWT)], session: Session = Depends(get_session)):
+def read_announcements(jwt: Annotated[dict, Depends(JWT)], session: Session = Depends(get_session), query: Optional[str] = None):
     user_id = jwt.get("sub")
     if not user_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid JWT: missing sub claim")
 
-    permissions = get_user_perms(session, user_id).get("permissions")
-    announcement_ids = fetch_user_announcements(session, ["all-users", permissions.get("class"), permissions.get("department")])
+    permissions = get_user_perms(session, user_id)
+    announcement_ids = fetch_user_announcements(session, ["all-users", permissions.get("class"), permissions.get("department")], query)
     return {"announcement_ids": announcement_ids}
 
 @app.get("/announcements/{announcement_id}")

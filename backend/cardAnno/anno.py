@@ -5,15 +5,20 @@ from custom_types import AnnouncementReturn
 from common import check_tag_weak, format_str_tags, str_to_tags
 
 
-def fetch_user_announcements(session: Session, user_target: list[str]) -> list[int]:
+def fetch_user_announcements(session: Session, user_target: list[str], query: str = None) -> list[int]:
 
     statement = (
         select(Announcement)
-        .where(or_(check_tag_weak(str_to_tags(Announcement.target), user_target)))
         .order_by(Announcement.priority.desc())  # pyright: ignore[reportAttributeAccessIssue]
     )
     announcements = session.exec(statement).all()
-    announcement_ids = [announcement.id for announcement in announcements]
+    filtered = [
+        announcement
+        for announcement in announcements
+        if check_tag_weak(str_to_tags(announcement.target), user_target)
+        and (query is None or query.lower() in announcement.title.lower() or query.lower() in announcement.description.lower())
+    ]
+    announcement_ids = [announcement.id for announcement in filtered]
     return announcement_ids
 
 
