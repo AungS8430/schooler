@@ -16,6 +16,8 @@ from cardAnno.anno import (
     delete_announcement,
     fetch_user_announcements,
     post_announcement,
+    edit_announcement,
+    get_announcement_by_ID
 )
 from models import Announcement
 
@@ -170,32 +172,51 @@ def read_permissions(jwt: Annotated[dict, Depends(JWT)], session: Session = Depe
 
 
 @app.get("/announcements")
-def read_announcements(session: Session = Depends(get_session)):
+def read_announcements(jwt: Annotated[dict, Depends(JWT)], session: Session = Depends(get_session)):
+    user_id = jwt.get("sub")
+    if not user_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid JWT: missing sub claim")
 
-    announcement_ids = fetch_user_announcements(session, ["all-users"])
+    permissions = get_user_perms(session, user_id).get("permissions")
+    announcement_ids = fetch_user_announcements(session, ["all-users", permissions.get("class"), permissions.get("department")])
     return {"announcement_ids": announcement_ids}
 
+@app.get("/announcements/{announcement_id}")
+def read_announcement(announcement_id: int, jwt: Annotated[dict, Depends(JWT)], session: Session = Depends(get_session)):
+    user_id = jwt.get("sub")
+    if not user_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid JWT: missing sub claim")
+    announcement = get_announcement_by_ID(session, announcement_id)
+    if not announcement:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Announcement not found")
+    if not any(tag in ["all-users", get_user_perms(session, user_id).get("permissions").get("class"), get_user_perms(session, user_id).get("permissions").get("department")] for tag in announcement.target.split(",")):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden: You do not have access to this announcement")
+    return {"announcement": announcement}
 
-@app.post("/postAnnouncement")
+
+@app.post("/announcements")
 def create_announcement(
     title: str,
     description: str,
     thumbnail: str | None,
-    authorName: str,
-    authorImage: str | None,
     date: str,
     target: str,
     priority: int,
+    jwt: Annotated[dict, Depends(JWT)],
     session: Session = Depends(get_session),
 ):
-
+    user_id = jwt.get("sub")
+    if not user_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid JWT: missing sub claim")
+    permissions = get_user_perms(session, user_id).get("permissions")
+    if not permissions.get("role") or permissions.get("role") not in ["admin", "teacher"]:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden: You do not have permission to create announcements")
     new_announcement = post_announcement(
         session=session,
         title=title,
         description=description,
         thumbnail=thumbnail,
-        authorName=authorName,
-        authorImage=authorImage,
+        author_id=user_id,
         date=date,
         target=target,
         priority=priority,
@@ -203,7 +224,7 @@ def create_announcement(
     return {"announcement": new_announcement}
 
 
-@app.delete("/deleteAnnouncement/{announcement_id}")
+@app.delete("/announcements/{announcement_id}")
 def remove_announcement(
     announcement_id: int,
     session: Session = Depends(get_session),
@@ -211,3 +232,40 @@ def remove_announcement(
 
     delete_announcement(session, announcement_id)
     return {"detail": "Announcement deleted successfully."}
+
+@app.patch("/announcements/{announcement_id}")
+def update_announcement(
+    announcement_id: int,
+    jwt: Annotated[dict, Depends(JWT)],
+    title: str | None = None,
+    description: str | None = None,
+    thumbnail: str | None = None,
+    date: str | None = None,
+    target: str | None = None,
+    priority: int | None = None,
+    session: Session = Depends(get_session),
+):
+    user_id = jwt.get("sub")
+    if not user_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid JWT: missing sub claim")
+
+    announcement = session.get(Announcement, announcement_id)
+    if not announcement:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Announcement not found")
+    if announcement.author_id != user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden: You do not have permission to edit this announcement")
+
+    updated_announcement = edit_announcement(
+        session=session,
+        announcement_id=announcement_id,
+        title=title,
+        description=description,
+        thumbnail=thumbnail,
+        user_id=user_id,
+        date=date,
+        target=target,
+        priority=priority,
+    )
+    if not updated_announcement:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Announcement not found")
+    return {"announcement": updated_announcement}

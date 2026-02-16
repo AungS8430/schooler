@@ -1,6 +1,7 @@
 from sqlmodel import Session, or_, select
 
-from models import Announcement
+from models import Announcement, User
+from custom_types import AnnouncementReturn
 from common import check_tag_weak, format_str_tags, str_to_tags
 
 
@@ -21,18 +22,16 @@ def post_announcement(
     title: str,
     description: str,
     thumbnail: str | None,
-    authorName: str,
-    authorImage: str | None,
+    author_id: str,
     date: str,
     target: str,
     priority: int,
-) -> Announcement:
+) -> AnnouncementReturn:
     new_announcement = Announcement(
         title=title,
         description=description,
         thumbnail=thumbnail,
-        authorName=authorName,
-        authorImage=authorImage,
+        author_id=author_id,
         date=date,
         target=format_str_tags(target),
         priority=priority,
@@ -40,12 +39,28 @@ def post_announcement(
     session.add(new_announcement)
     session.commit()
     session.refresh(new_announcement)
-    return new_announcement
+    user = session.get(User, author_id)
+    if not user:
+        raise ValueError("Author not found.")
+    return AnnouncementReturn(
+        id=new_announcement.id,
+        title=new_announcement.title,
+        description=new_announcement.description,
+        thumbnail=new_announcement.thumbnail,
+        author_id=new_announcement.author_id,
+        authorName=user.name,
+        authorImage=user.image,
+        date=new_announcement.date,
+        target=new_announcement.target,
+        priority=new_announcement.priority,
+    )
 
 
-def delete_announcement(session: Session, announcement_id: int) -> None:
+def delete_announcement(session: Session, announcement_id: int, user_id: str) -> None:
     announcement = session.get(Announcement, announcement_id)
     if announcement:
+        if announcement.author_id != user_id:
+            raise PermissionError("You do not have permission to delete this announcement.")
         session.delete(announcement)
         session.commit()
 
@@ -53,27 +68,24 @@ def delete_announcement(session: Session, announcement_id: int) -> None:
 def edit_announcement(
     session: Session,
     announcement_id: int,
+    user_id: str,
     title: str | None = None,
     description: str | None = None,
     thumbnail: str | None = None,
-    authorName: str | None = None,
-    authorImage: str | None = None,
     date: str | None = None,
     target: str | None = None,
     priority: int | None = None,
-) -> Announcement | None:
+) -> AnnouncementReturn | None:
     announcement = session.get(Announcement, announcement_id)
     if announcement:
+        if announcement.author_id != user_id:
+            raise PermissionError("You do not have permission to edit this announcement.")
         if title is not None:
             announcement.title = title
         if description is not None:
             announcement.description = description
         if thumbnail is not None:
             announcement.thumbnail = thumbnail
-        if authorName is not None:
-            announcement.authorName = authorName
-        if authorImage is not None:
-            announcement.authorImage = authorImage
         if date is not None:
             announcement.date = date
         if target is not None:
@@ -83,13 +95,41 @@ def edit_announcement(
         session.add(announcement)
         session.commit()
         session.refresh(announcement)
-        return announcement
+        user = session.get(User, announcement.author_id)
+        if not user:
+            raise ValueError("Author not found.")
+        return AnnouncementReturn(
+            id=announcement.id,
+            title=announcement.title,
+            description=announcement.description,
+            thumbnail=announcement.thumbnail,
+            author_id=announcement.author_id,
+            authorName=user.name,
+            authorImage=user.image,
+            date=announcement.date,
+            target=announcement.target,
+            priority=announcement.priority,
+        )
     return None
 
 
 def get_announcement_by_ID(
     session: Session,
     announcement_id: int,
-) -> Announcement | None:
+) -> AnnouncementReturn | None:
     announcement = session.get(Announcement, announcement_id)
-    return announcement
+    user = session.get(User, announcement.author_id) if announcement else None
+    if announcement and user:
+        return AnnouncementReturn(
+            id=announcement.id,
+            title=announcement.title,
+            description=announcement.description,
+            thumbnail=announcement.thumbnail,
+            author_id=announcement.author_id,
+            authorName=user.name,
+            authorImage=user.image,
+            date=announcement.date,
+            target=announcement.target,
+            priority=announcement.priority,
+        )
+    return None

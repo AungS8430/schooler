@@ -104,3 +104,16 @@ class Calendar:
             "start": self.start,
             "end": self.end,
         }
+
+@dataclass
+class AnnouncementReturn:
+    id: int
+    title: str
+    description: str
+    thumbnail: Optional[str]
+    author_id: str
+    authorName: str
+    authorImage: Optional[str]
+    date: str
+    target: str
+    priority: int
