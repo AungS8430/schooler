@@ -141,6 +141,7 @@ class AnnouncementCreate(BaseModel):
     thumbnail: Optional[str] = None
     priority: int
 
+
 class AnnouncementUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None

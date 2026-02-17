@@ -1,5 +1,5 @@
 from common import check_tag_strong
-from custom_types import Calendar, Event, Room
+from custom_types import Calendar, Event, OverrideType, Room
 from schoolScheduler import loader
 
 
@@ -17,7 +17,7 @@ def get_events(room: Room) -> list[Event]:
                 duration=event.get("duration", 1),
                 title=event["event"],
                 description=event.get("description", ""),
-                type=event.get("type", "general"),
+                type=OverrideType(event.get("type", "other")),
             )
         )
     return out
@@ -34,7 +34,7 @@ def get_events_all() -> list[Event]:
                 duration=event.get("duration", 1),
                 title=event["event"],
                 description=event.get("description", ""),
-                type=event.get("type", "general"),
+                type=OverrideType(event.get("type", "other")),
             )
         )
     return out
