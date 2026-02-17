@@ -17,7 +17,13 @@ from cardAnno.anno import (
     get_announcement_by_ID,
     post_announcement,
 )
-from custom_types import GRADE_LOOKUP, AnnouncementCreate, OAuthUpsertIn, Room
+from custom_types import (
+    CLASSES_LOOKUP,
+    GRADE_LOOKUP,
+    AnnouncementCreate,
+    OAuthUpsertIn,
+    Room,
+)
 from models import Announcement, User
 from schoolScheduler import fixed_week_schedule, get_academic_info, get_events_all
 from user.auth import OAuthAccountConflict, get_user_perms, upsert_user_from_oauth
@@ -350,3 +356,20 @@ def get_grades(
         year = 1 if user.year is None else user.year
     grade = f"{GRADE_LOOKUP[year]}"
     return {"grades": grade}
+
+
+@app.get("/classes")
+def get_classes(
+    jwt: Annotated[Optional[dict], Depends(JWT)],
+    grade: int = 1,
+    department: Optional[str] = None,
+):
+    if not 0 < grade < 6:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid grade"
+        )
+    user_id = ensure_jwt_and_get_sub(jwt)
+    if department is None:
+        year = 1
+        return {"department": CLASSES_LOOKUP[year]}
+    return {"classes": CLASSES_LOOKUP[grade][department]}

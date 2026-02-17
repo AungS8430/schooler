@@ -32,6 +32,13 @@ GRADE_LOOKUP = {
     4: "4th year",
     5: "5th year",
 }
+CLASSES_LOOKUP = {
+    1: {"computer": [1, 2], "mechatronic": [1, 2], "electrical": [1, 2]},
+    2: {"computer": [1, 2], "mechatronic": [1, 2], "electrical": [1, 2]},
+    3: {"computer": [1, 2], "mechatronic": [1], "electrical": [1]},
+    4: {"computer": [1], "mechatronic": [1], "electrical": [1]},
+    5: {"computer": [1], "mechatronic": [1], "electrical": [1]},
+}
 
 
 class OverrideType(Enum):
