@@ -223,6 +223,7 @@ def read_announcements(
     announcement_ids = fetch_user_announcements(session, query)
     return {"announcement_ids": announcement_ids}
 
+
 @app.get("/announcements/{announcement_id}")
 def read_announcement(
     announcement_id: int,
@@ -246,7 +247,10 @@ def create_announcement(
 ):
     user_id = jwt.get("sub")
     if not user_id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid JWT: missing sub claim")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid JWT: missing sub claim",
+        )
     permissions = get_user_perms(session, user_id)
     if permissions is None:
         raise HTTPException(
@@ -296,9 +300,14 @@ def update_announcement(
 
     announcement = session.get(Announcement, announcement_id)
     if not announcement:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Announcement not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Announcement not found"
+        )
     if announcement.author_id != user_id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden: You do not have permission to edit this announcement")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Forbidden: You do not have permission to edit this announcement",
+        )
 
     updated_announcement = edit_announcement(
         session=session,
@@ -315,3 +324,145 @@ def update_announcement(
             status_code=status.HTTP_404_NOT_FOUND, detail="Announcement not found"
         )
     return {"announcement": updated_announcement}
+
+
+@app.get("/school-academic-calendar")
+def get_school_academic_calendar(
+    jwt: Annotated[Optional[dict], Depends(JWT)],
+):
+    ensure_jwt_and_get_sub(jwt)
+    return get_academic_info(get_events_all()).convert()
+
+
+@app.get("/get-personal-calendar")
+def get_personal_calendar(
+    jwt: Annotated[Optional[dict], Depends(JWT)],
+    session: Session = Depends(get_session),
+):
+    user_id = ensure_jwt_and_get_sub(jwt)
+    user = session.get(User, user_id)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+    if user.year is None or user.department is None or user.class_ is None:
+        year = 1
+        department = "computer"
+        class_ = 1
+    else:
+        year = user.year
+        department = user.department
+        class_ = int(user.class_)
+    room = Room(year, department, class_)
+    return get_academic_info(get_events(room)).convert()
+
+
+@app.get("/school-timetable")
+def get_school_timetable(
+    jwt: Annotated[Optional[dict], Depends(JWT)],
+    session: Session = Depends(get_session),
+):
+    user_id = ensure_jwt_and_get_sub(jwt)
+    user = session.get(User, user_id)
+    if user is None:
+        year = 1
+        department = "computer"
+        class_ = 1
+    else:
+        year = 1 if user.year is None else user.year
+        department = "computer" if user.department is None else user.department
+        class_ = 1 if user.class_ is None else int(user.class_)
+    room = Room(year, department, class_)
+    return fixed_week_schedule(room)
+
+
+@app.get("/dated-timetable")
+def get_dated_timetable(
+    jwt: Annotated[Optional[dict], Depends(JWT)],
+    session: Session = Depends(get_session),
+    when: Optional[str] = None,
+):
+    if when is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Date query parameter is required",
+        )
+    user_id = ensure_jwt_and_get_sub(jwt)
+    user = session.get(User, user_id)
+    if user is None:
+        year = 1
+        department = "computer"
+        class_ = 1
+    else:
+        year = 1 if user.year is None else user.year
+        department = "computer" if user.department is None else user.department
+        class_ = 1 if user.class_ is None else int(user.class_)
+    room = Room(year, department, class_)
+    return week_schedule(room, date.fromisoformat(when))
+
+
+@app.get("/grades")
+def get_grades(
+    jwt: Annotated[Optional[dict], Depends(JWT)],
+    session: Session = Depends(get_session),
+):
+    user_id = ensure_jwt_and_get_sub(jwt)
+    user = session.get(User, user_id)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+    if user is None:
+        year = 1
+    else:
+        year = 1 if user.year is None else user.year
+    grade = f"{GRADE_LOOKUP[year]}"
+    return {"grades": grade}
+
+
+@app.get("/classes")
+def get_classes(
+    jwt: Annotated[Optional[dict], Depends(JWT)],
+    grade: int = 1,
+    department: Optional[str] = None,
+):
+    if not 0 < grade < 6:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid grade"
+        )
+    ensure_jwt_and_get_sub(jwt)
+    if department is None:
+        year = 1
+        return {"department": CLASSES_LOOKUP[year]}
+    return {"classes": CLASSES_LOOKUP[grade][department]}
+
+
+@app.get("/people")
+def get_people(
+    jwt: Annotated[Optional[dict], Depends(JWT)],
+    session: Session = Depends(get_session),
+    grade: Optional[int] = None,
+    department: Optional[str] = None,
+    class_: Optional[int] = None,
+):
+    ensure_jwt_and_get_sub(jwt)
+    exected_query = (
+        select(User)
+        .where(User.year == grade if grade is not None else True)
+        .where(User.department == department if department is not None else True)
+        .where(User.class_ == class_ if class_ is not None else True)
+    )
+    users = session.exec(exected_query).all()
+    users = [x.model_dump_json() for x in users]
+    return {"users": users}
+
+
+@app.get("/resources")
+def get_resources():
+    return {
+        "id": 1,
+        "title": "Example Resource",
+        "author": "Jeffery Doe",
+        "url": "https://drive.google.com/drive/u",
+        "categorites": ["default", "default"],
+    }
