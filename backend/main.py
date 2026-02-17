@@ -373,3 +373,23 @@ def get_classes(
         year = 1
         return {"department": CLASSES_LOOKUP[year]}
     return {"classes": CLASSES_LOOKUP[grade][department]}
+
+
+@app.get("/people")
+def get_people(
+    jwt: Annotated[Optional[dict], Depends(JWT)],
+    session: Session = Depends(get_session),
+    grade: Optional[int] = None,
+    department: Optional[str] = None,
+    class_: Optional[int] = None,
+):
+    user_id = ensure_jwt_and_get_sub(jwt)
+    exected_query = (
+        select(User)
+        .where(User.year == grade if grade is not None else True)
+        .where(User.department == department if department is not None else True)
+        .where(User.class_ == class_ if class_ is not None else True)
+    )
+    users = session.exec(exected_query).all()
+    users = [x.model_dump_json() for x in users]
+    return {"users": users}
