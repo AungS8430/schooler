@@ -116,7 +116,6 @@ def edit_announcement(
             content=announcement.content,
             thumbnail=announcement.thumbnail,
             author_id=announcement.author_id,
-            content=announcement.content,
             authorName=user.name,
             authorImage=user.image,
             date=announcement.date,

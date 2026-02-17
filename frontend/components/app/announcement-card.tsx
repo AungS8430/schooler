@@ -64,7 +64,7 @@ export default function AnnouncementCard({ id, title, description, thumbnail, au
         </Button>
         {editable && (
           <Button variant="outline" size="icon" asChild>
-            <Link href={`/app/announcements/edit/${id}`}><Pencil /></Link>
+            <Link href={`/app/announcements/${id}/edit`}><Pencil /></Link>
           </Button>
         )}
       </CardFooter>

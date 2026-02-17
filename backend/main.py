@@ -21,6 +21,7 @@ from custom_types import (
     CLASSES_LOOKUP,
     GRADE_LOOKUP,
     AnnouncementCreate,
+    AnnouncementUpdate,
     OAuthUpsertIn,
     Room,
 )
