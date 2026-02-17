@@ -38,7 +38,7 @@ export default function AnnouncementCard({ id, title, description, thumbnail, au
           </Badge>
         </CardAction>
         <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
+        <CardDescription className="line-clamp-3 wrap-break-word">{description}</CardDescription>
       </CardHeader>
       <div className="grow" />
       <CardContent>
