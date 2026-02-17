@@ -100,8 +100,8 @@ class Event:
             "id": self.id,
             "type": self.type.value,
             "title": self.title,
-            "start": self.date,
-            "end": self.date + timedelta(days=self.duration),
+            "start": (self.date).isoformat(),
+            "end": (self.date + timedelta(days=self.duration)).isoformat(),
             "description": self.description,
         }
 
