@@ -91,10 +91,9 @@
     "type": "holiday",
     "actions": [
       {
-        "replace": {
-          "for": [["all-classes"]],
-          "with": "no-class"
-        }
+        "action": "replace",
+        "for": [["all-classes"]],
+        "with": "no-class-Exam"
       }
     ]
   },
