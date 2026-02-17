@@ -1,6 +1,6 @@
 import logging
 from contextlib import asynccontextmanager
-from datetime import datetime
+from datetime import date, datetime
 from os import getenv
 from typing import Annotated, Optional
 
@@ -25,7 +25,13 @@ from custom_types import (
     Room,
 )
 from models import Announcement, User
-from schoolScheduler import fixed_week_schedule, get_academic_info, get_events_all
+from schoolScheduler import (
+    fixed_week_schedule,
+    get_academic_info,
+    get_events,
+    get_events_all,
+    week_schedule,
+)
 from user.auth import OAuthAccountConflict, get_user_perms, upsert_user_from_oauth
 
 logger = logging.getLogger("uvicorn.error")
@@ -319,6 +325,30 @@ def get_school_academic_calendar():
     return get_academic_info(get_events_all()).convert()
 
 
+@app.get("/get-personal-calendar")
+def get_personal_calendar(
+    jwt: Annotated[Optional[dict], Depends(JWT)],
+    session: Session = Depends(get_session),
+):
+    user_id = ensure_jwt_and_get_sub(jwt)
+    user = session.get(User, user_id)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+    # If the user record exists but fields are None, fall back to sensible defaults
+    if user.year is None or user.department is None or user.class_ is None:
+        year = 1
+        department = "computer"
+        class_ = 1
+    else:
+        year = user.year
+        department = user.department
+        class_ = int(user.class_)
+    room = Room(year, department, class_)
+    return get_academic_info(get_events(room)).convert()
+
+
 @app.get("/school-timetable")
 def get_school_timetable(
     jwt: Annotated[Optional[dict], Depends(JWT)],
@@ -337,6 +367,32 @@ def get_school_timetable(
         class_ = 1 if user.class_ is None else int(user.class_)
     room = Room(year, department, class_)
     return fixed_week_schedule(room)
+
+
+@app.get("/dated-timetable")
+def get_dated_timetable(
+    jwt: Annotated[Optional[dict], Depends(JWT)],
+    session: Session = Depends(get_session),
+    when: Optional[str] = None,
+):
+    if when is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Date query parameter is required",
+        )
+    user_id = ensure_jwt_and_get_sub(jwt)
+    user = session.get(User, user_id)
+    # If the user record doesn't exist or fields are None, fall back to sensible defaults
+    if user is None:
+        year = 1
+        department = "computer"
+        class_ = 1
+    else:
+        year = 1 if user.year is None else user.year
+        department = "computer" if user.department is None else user.department
+        class_ = 1 if user.class_ is None else int(user.class_)
+    room = Room(year, department, class_)
+    return week_schedule(room, date.fromisoformat(when))
 
 
 @app.get("/grades")
