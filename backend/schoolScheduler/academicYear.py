@@ -1,5 +1,3 @@
-from datetime import date
-
 from common import check_tag_strong
 from custom_types import Calendar, Event, Room
 from schoolScheduler import loader
