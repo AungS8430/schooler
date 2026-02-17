@@ -130,7 +130,7 @@ export default function AnnouncementPage({ params }: { params: Promise<{ announc
           { announcement.thumbnail && (
             <Image src={announcement.thumbnail} width={1000} height={1000} className="w-full h-64 rounded-md" alt={announcement.title}/>
           )}
-          <div className="px-4">
+          <div className="px-4 pb-4">
             <p className="text-lg">{announcement.description}</p>
           </div>
           <div className="max-w-5xl mx-auto w-full px-4">
