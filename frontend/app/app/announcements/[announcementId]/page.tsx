@@ -84,7 +84,7 @@ export default function AnnouncementPage({ params }: { params: Promise<{ announc
           {
             (perms && (perms.role === "teacher" || perms.role === "admin") ? announcement.author_id === session.data?.user?.id : false) && (
               <div className="flex flex-row gap-1">
-                <Link href={`/app/announcements/edit/${announcement.id}`}>
+                <Link href={`/app/announcements/${announcement.id}/edit`}>
                   <Button size="icon"><Pencil /></Button>
                 </Link>
                 <AlertDialog>
