@@ -25,6 +25,20 @@ TIME_LOOKUP = {1: "Monday", 2: "Tuesday", 3: "Wednesday", 4: "Thursday", 5: "Fri
 GRADE = ["year1", "year2", "year3", "year4", "year5"]
 DEPARTMENT = ["computer", "mechatronic", "electrical"]
 ROOM = [f"room{x}" for x in range(1, 11)]
+GRADE_LOOKUP = {
+    1: "1st year",
+    2: "2nd year",
+    3: "3rd year",
+    4: "4th year",
+    5: "5th year",
+}
+CLASSES_LOOKUP = {
+    1: {"computer": [1, 2], "mechatronic": [1, 2], "electrical": [1, 2]},
+    2: {"computer": [1, 2], "mechatronic": [1, 2], "electrical": [1, 2]},
+    3: {"computer": [1, 2], "mechatronic": [1], "electrical": [1]},
+    4: {"computer": [1], "mechatronic": [1], "electrical": [1]},
+    5: {"computer": [1], "mechatronic": [1], "electrical": [1]},
+}
 
 
 class OverrideType(Enum):
@@ -105,15 +119,16 @@ class Calendar:
             "end": self.end,
         }
 
+
 @dataclass
 class AnnouncementReturn:
-    id: int
+    id: Optional[int]
     title: str
     description: str
     content: Optional[str]
     thumbnail: Optional[str]
     author_id: str
-    authorName: str
+    authorName: Optional[str]
     authorImage: Optional[str]
     date: str
     priority: int

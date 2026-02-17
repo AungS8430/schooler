@@ -1,31 +1,36 @@
-from sqlmodel import select, Session
-from sqlalchemy.exc import IntegrityError
-from typing import Optional
-from models import User, OAuthAccount
-from user.security import encrypt_token
 import uuid
+from typing import Optional
+
+from sqlalchemy.exc import IntegrityError
+from sqlmodel import Session, select
+
+from models import OAuthAccount, User
+from user.security import encrypt_token
+
 
 class OAuthAccountConflict(Exception):
     pass
+
 
 def get_user_by_email(session: Session, email: str) -> Optional[User]:
     result = session.exec(select(User).where(User.email == email))
     return result.first()
 
+
 def upsert_user_from_oauth(
-        session: Session,
-        provider: str,
-        provider_account_id: str,
-        email: str,
-        name: Optional[str] = None,
-        image: Optional[str] = None,
-        tokens: Optional[dict] = None,
+    session: Session,
+    provider: str,
+    provider_account_id: str,
+    email: str,
+    name: Optional[str] = None,
+    image: Optional[str] = None,
+    tokens: Optional[dict] = None,
 ) -> User:
     existing_acc = session.exec(
         select(OAuthAccount).where(
             OAuthAccount.provider == provider,
             OAuthAccount.provider_account_id == provider_account_id,
-            )
+        )
     ).first()
 
     if existing_acc:
@@ -56,12 +61,14 @@ def upsert_user_from_oauth(
         select(OAuthAccount).where(
             OAuthAccount.provider == provider,
             OAuthAccount.provider_account_id == provider_account_id,
-            )
+        )
     ).first()
 
     if acc_after:
         if acc_after.user_id != user.id:
-            raise OAuthAccountConflict("OAuth account already linked to a different user")
+            raise OAuthAccountConflict(
+                "OAuth account already linked to a different user"
+            )
         if tokens:
             acc_after.access_token_enc = encrypt_token(tokens.get("access_token"))
             acc_after.refresh_token_enc = encrypt_token(tokens.get("refresh_token"))
@@ -77,7 +84,9 @@ def upsert_user_from_oauth(
         provider_account_id=provider_account_id,
         user_id=user.id,
         access_token_enc=encrypt_token(tokens.get("access_token")) if tokens else None,
-        refresh_token_enc=encrypt_token(tokens.get("refresh_token")) if tokens else None,
+        refresh_token_enc=encrypt_token(tokens.get("refresh_token"))
+        if tokens
+        else None,
         expires_at=tokens.get("expires_at") if tokens else None,
         scope=tokens.get("scope") if tokens else None,
     )
@@ -91,13 +100,15 @@ def upsert_user_from_oauth(
             select(OAuthAccount).where(
                 OAuthAccount.provider == provider,
                 OAuthAccount.provider_account_id == provider_account_id,
-                )
+            )
         ).first()
         if not acc_raced:
             # Unexpected: re-raise
             raise
         if acc_raced.user_id != user.id:
-            raise OAuthAccountConflict("OAuth account already linked to a different user")
+            raise OAuthAccountConflict(
+                "OAuth account already linked to a different user"
+            )
         if tokens:
             acc_raced.access_token_enc = encrypt_token(tokens.get("access_token"))
             acc_raced.refresh_token_enc = encrypt_token(tokens.get("refresh_token"))
@@ -109,6 +120,7 @@ def upsert_user_from_oauth(
 
     session.refresh(user)
     return user
+
 
 def get_user_perms(session: Session, user_id: str) -> Optional[dict]:
     user = session.get(User, user_id)

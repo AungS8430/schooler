@@ -1,21 +1,27 @@
-from sqlmodel import Session, or_, select
+from sqlmodel import Session, select
 
-from models import Announcement, User
 from custom_types import AnnouncementReturn
-from common import check_tag_weak, format_str_tags, str_to_tags
+from models import Announcement, User
 
 
-def fetch_user_announcements(session: Session, query: str = None) -> list[int]:
+def fetch_user_announcements(
+    session: Session, query: str | None = None
+) -> list[int | None]:
+    if query is not None:
+        query = query.strip()
 
     statement = (
-        select(Announcement)
-        .order_by(Announcement.priority.desc())  # pyright: ignore[reportAttributeAccessIssue]
+        select(Announcement).order_by(Announcement.priority.desc())  # pyright: ignore[reportAttributeAccessIssue]
     )
     announcements = session.exec(statement).all()
     filtered = [
         announcement
         for announcement in announcements
-        if (query is None or query.lower() in announcement.title.lower() or query.lower() in announcement.description.lower())
+        if (
+            query is None
+            or query.lower() in announcement.title.lower()
+            or query.lower() in announcement.description.lower()
+        )
     ]
     announcement_ids = [announcement.id for announcement in filtered]
     return announcement_ids
@@ -64,7 +70,9 @@ def delete_announcement(session: Session, announcement_id: int, user_id: str) ->
     announcement = session.get(Announcement, announcement_id)
     if announcement:
         if announcement.author_id != user_id:
-            raise PermissionError("You do not have permission to delete this announcement.")
+            raise PermissionError(
+                "You do not have permission to delete this announcement."
+            )
         session.delete(announcement)
         session.commit()
 
@@ -82,7 +90,9 @@ def edit_announcement(
     announcement = session.get(Announcement, announcement_id)
     if announcement:
         if announcement.author_id != user_id:
-            raise PermissionError("You do not have permission to edit this announcement.")
+            raise PermissionError(
+                "You do not have permission to edit this announcement."
+            )
         if title is not None:
             announcement.title = title
         if description is not None:
@@ -106,6 +116,7 @@ def edit_announcement(
             content=announcement.content,
             thumbnail=announcement.thumbnail,
             author_id=announcement.author_id,
+            content=announcement.content,
             authorName=user.name,
             authorImage=user.image,
             date=announcement.date,

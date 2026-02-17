@@ -1,26 +1,38 @@
 import logging
-from datetime import datetime
 from contextlib import asynccontextmanager
+from datetime import date, datetime
 from os import getenv
 from typing import Annotated, Optional
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, Depends, Header, HTTPException, status
+from fastapi import Depends, FastAPI, Header, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_nextauth_jwt import NextAuthJWT
-from sqlmodel import Field, Session, SQLModel, create_engine, select
+from sqlmodel import Session, SQLModel, create_engine, select
 
-from custom_types import OAuthUpsertIn, AnnouncementCreate, AnnouncementUpdate
-
-from user.auth import upsert_user_from_oauth, get_user_perms, OAuthAccountConflict
 from cardAnno.anno import (
     delete_announcement,
-    fetch_user_announcements,
-    post_announcement,
     edit_announcement,
-    get_announcement_by_ID
+    fetch_user_announcements,
+    get_announcement_by_ID,
+    post_announcement,
 )
-from models import Announcement
+from custom_types import (
+    CLASSES_LOOKUP,
+    GRADE_LOOKUP,
+    AnnouncementCreate,
+    OAuthUpsertIn,
+    Room,
+)
+from models import Announcement, User
+from schoolScheduler import (
+    fixed_week_schedule,
+    get_academic_info,
+    get_events,
+    get_events_all,
+    week_schedule,
+)
+from user.auth import OAuthAccountConflict, get_user_perms, upsert_user_from_oauth
 
 logger = logging.getLogger("uvicorn.error")
 logger.setLevel(logging.INFO)
@@ -109,8 +121,33 @@ app.add_middleware(
 JWT = NextAuthJWT(secret=JWT_SECRET)
 
 
+def ensure_jwt_and_get_sub(jwt: Optional[dict]) -> str:
+    """
+    Helper to make explicit checks for the jwt object and the 'sub' claim.
+    This avoids static-analyzer warnings about calling dict methods on None.
+    """
+    if jwt is None or not isinstance(jwt, dict):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid JWT: authentication required",
+        )
+    user_id = jwt.get("sub")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid JWT: missing sub claim",
+        )
+    return user_id
+
+
 @app.get("/")
-async def bounce_jwt(jwt: Annotated[dict, Depends(JWT)]):
+async def bounce_jwt(jwt: Annotated[Optional[dict], Depends(JWT)]):
+    # Explicitly check jwt isn't None so static analysis knows jwt is a dict below.
+    if jwt is None or not isinstance(jwt, dict):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid JWT: authentication required",
+        )
     return jwt
 
 
@@ -132,11 +169,12 @@ async def getDBHealthCheck():
         # Return the error detail to help debugging (suitable for internal use)
         return {"status": "unhealthy", "detail": str(e)}
 
+
 @app.post("/internal/oauth/upsert", status_code=status.HTTP_200_OK)
 def oauth_upsert(
-        payload: OAuthUpsertIn,
-        x_internal_secret: Optional[str] = Header(None),
-        session: Session = Depends(get_session),
+    payload: OAuthUpsertIn,
+    x_internal_secret: Optional[str] = Header(None),
+    session: Session = Depends(get_session),
 ):
     """
     Internal endpoint called server-side (NextAuth signIn callback) to upsert a User and OAuthAccount.
@@ -162,33 +200,40 @@ def oauth_upsert(
 
     return {"id": user.id, "email": user.email}
 
-@app.get("/permissions")
-def read_permissions(jwt: Annotated[dict, Depends(JWT)], session: Session = Depends(get_session)):
-    user_id = jwt.get("sub")
-    if not user_id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid JWT: missing sub claim")
 
+@app.get("/permissions")
+def read_permissions(
+    jwt: Annotated[Optional[dict], Depends(JWT)],
+    session: Session = Depends(get_session),
+):
+    # Make the presence of the jwt explicit for the analyzer
+    user_id = ensure_jwt_and_get_sub(jwt)
     permissions = get_user_perms(session, user_id)
     return {"permissions": permissions}
 
 
 @app.get("/announcements")
-def read_announcements(jwt: Annotated[dict, Depends(JWT)], session: Session = Depends(get_session), query: Optional[str] = None):
-    user_id = jwt.get("sub")
-    if not user_id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid JWT: missing sub claim")
-
+def read_announcements(
+    jwt: Annotated[Optional[dict], Depends(JWT)],
+    session: Session = Depends(get_session),
+    query: Optional[str] = None,
+):
+    ensure_jwt_and_get_sub(jwt)
     announcement_ids = fetch_user_announcements(session, query)
     return {"announcement_ids": announcement_ids}
 
 @app.get("/announcements/{announcement_id}")
-def read_announcement(announcement_id: int, jwt: Annotated[dict, Depends(JWT)], session: Session = Depends(get_session)):
-    user_id = jwt.get("sub")
-    if not user_id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid JWT: missing sub claim")
+def read_announcement(
+    announcement_id: int,
+    jwt: Annotated[Optional[dict], Depends(JWT)],
+    session: Session = Depends(get_session),
+):
+    ensure_jwt_and_get_sub(jwt)
     announcement = get_announcement_by_ID(session, announcement_id)
     if not announcement:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Announcement not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Announcement not found"
+        )
     return {"announcement": announcement}
 
 
@@ -202,8 +247,19 @@ def create_announcement(
     if not user_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid JWT: missing sub claim")
     permissions = get_user_perms(session, user_id)
-    if not permissions.get("role") or permissions.get("role") not in ["admin", "teacher"]:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden: You do not have permission to create announcements")
+    if permissions is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Forbidden: You do not have permission to create announcements",
+        )
+    if not permissions.get("role") or permissions.get("role") not in [
+        "admin",
+        "teacher",
+    ]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Forbidden: You do not have permission to create announcements",
+        )
     new_announcement = post_announcement(
         session=session,
         title=announcement_data.title,
@@ -220,29 +276,22 @@ def create_announcement(
 @app.delete("/announcements/{announcement_id}")
 def remove_announcement(
     announcement_id: int,
-    jwt: Annotated[dict, Depends(JWT)],
+    jwt: Annotated[Optional[dict], Depends(JWT)],
     session: Session = Depends(get_session),
 ):
-    user_id = jwt.get("sub")
-    if not user_id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid JWT: missing sub claim")
-
+    user_id = ensure_jwt_and_get_sub(jwt)
     delete_announcement(session, announcement_id, user_id)
     return {"detail": "Announcement deleted successfully."}
+
 
 @app.patch("/announcements/{announcement_id}")
 def update_announcement(
     announcement_id: int,
     announcement_data: AnnouncementUpdate,
-    jwt: Annotated[dict, Depends(JWT)],
+    jwt: Annotated[Optional[dict], Depends(JWT)],
     session: Session = Depends(get_session),
 ):
-    user_id = jwt.get("sub")
-    if not user_id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid JWT: missing sub claim")
-    user_id = jwt.get("sub")
-    if not user_id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid JWT: missing sub claim")
+    user_id = ensure_jwt_and_get_sub(jwt)
 
     announcement = session.get(Announcement, announcement_id)
     if not announcement:
@@ -261,5 +310,7 @@ def update_announcement(
         priority=announcement_data.priority,
     )
     if not updated_announcement:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Announcement not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Announcement not found"
+        )
     return {"announcement": updated_announcement}
