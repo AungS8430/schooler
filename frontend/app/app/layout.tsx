@@ -1,4 +1,5 @@
 import { SidebarProvider } from '@/components/ui/sidebar';
+import { SessionProvider } from "next-auth/react";
 import AppSidebar from "@/components/app/sidebar";
 import AppMenuBar from "@/components/app/menubar";
 import GradientBackground from "@/components/gradient-background";
@@ -15,9 +16,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     >
       <AppSidebar />
       <AppMenuBar />
-      <div className="flex-1 overflow-hidden">
-        <main>{children}</main>
-      </div>
+      <SessionProvider>
+        <div className="flex-1 overflow-hidden">
+          <main>{children}</main>
+        </div>
+      </SessionProvider>
+
       <GradientBackground
         className="-z-10 fixed"
         color="var(--primary)"

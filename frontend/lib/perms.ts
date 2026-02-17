@@ -7,7 +7,7 @@ interface Perms {
 }
 
 export function usePerms() {
-  const [perms, setPerms] = useState<Perms>({});
+  const [perms, setPerms] = useState<Perms | null>(null);
 
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/permissions`, {

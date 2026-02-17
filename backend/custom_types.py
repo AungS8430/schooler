@@ -125,3 +125,10 @@ class AnnouncementCreate(BaseModel):
     content: Optional[str] = None
     thumbnail: Optional[str] = None
     priority: int
+
+class AnnouncementUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    content: Optional[str] = None
+    thumbnail: Optional[str] = None
+    priority: Optional[int] = None

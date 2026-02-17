@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import { usePerms } from "@/lib/perms";
 import {
@@ -15,16 +15,31 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from "@/components/ui/select";
 import { ArrowLeft } from "lucide-react";
+import { useSession } from "next-auth/react";
 
-export default function CreateAnnouncementPage() {
+interface Announcement {
+  id: number;
+  title: string;
+  description: string;
+  thumbnail?: string;
+  author_id: string;
+  authorName: string;
+  authorImage?: string;
+  date: string;
+  priority: number;
+}
+
+export default function EditAnnouncementPage({ params }: { params: Promise<{ announcementId: string }> }) {
+  const { announcementId } = use(params);
   const router = useRouter();
   const perms = usePerms();
   const [formErrors, setFormErrors] = useState<{title?: boolean; description?: boolean}>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const [content, setContent] = useState<string>();
+  const [announcement, setAnnouncement] = useState<Announcement | null>(null);
+  const session = useSession();
 
-  async function handleCreateAnnouncement(e: React.FormEvent<HTMLFormElement>) {
+  async function handleEditAnnouncement(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsSubmitting(true);
 
@@ -44,6 +59,7 @@ export default function CreateAnnouncementPage() {
     }
 
     const payload = {
+      announcement_id: announcementId,
       title,
       description,
       content,
@@ -52,8 +68,8 @@ export default function CreateAnnouncementPage() {
     };
 
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/announcements`, {
-        method: "POST",
+      await fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/announcements/${announcementId}`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
@@ -61,22 +77,47 @@ export default function CreateAnnouncementPage() {
         body: JSON.stringify(payload),
       });
 
-      // Redirect back to announcements page after successful creation
       router.push("/app/announcements");
     } catch (error) {
-      console.error("Error creating announcement:", error);
+      console.error("Error editing announcement:", error);
       setIsSubmitting(false);
     }
   }
 
   useEffect(() => {
-    if (perms && (perms.role !== "teacher" && perms.role !== "admin")) {
+    if (!announcementId) return;
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/announcements/${announcementId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.announcement) {
+          router.replace("/app/announcements");
+          return;
+        }
+        setAnnouncement(data.announcement);
+        setContent(data.announcement.content || "");
+      })
+      .catch((error) => {
+        console.error(`Error fetching announcement ${announcementId}:`, error);
+      });
+  }, [announcementId]);
+
+  useEffect(() => {
+    if (perms && perms.role !== "teacher" && perms.role !== "admin") {
       router.replace("/app/announcements");
     }
-  }, [perms]);
+    if (announcement && session.data && announcement.author_id !== session.data?.user?.id) {
+      router.replace("/app/announcements");
+    }
+  }, [perms, announcement]);
 
   return (
-    perms && (perms.role === "teacher" || perms.role === "admin") && (
+    perms && (perms.role === "teacher" || perms.role === "admin") && announcement && announcement?.author_id === session.data?.user?.id && (
       <div className="flex flex-col h-screen w-full">
         {/* Header */}
         <div className="sticky top-0 z-10 border-border">
@@ -90,7 +131,7 @@ export default function CreateAnnouncementPage() {
               <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
             <h1 className="text-2xl font-semibold truncate">
-              Create Announcement
+              Edit Announcement
             </h1>
           </div>
         </div>
@@ -98,7 +139,7 @@ export default function CreateAnnouncementPage() {
         {/* Main Content */}
         <ScrollArea className="flex-1 overflow-y-auto mb-12 md:mb-0">
           <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-            <form onSubmit={handleCreateAnnouncement} className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+            <form onSubmit={handleEditAnnouncement} className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
               {/* Left Column - Form Fields */}
               <div className="w-full">
                 <FieldGroup className="space-y-4 sm:space-y-5">
@@ -111,6 +152,7 @@ export default function CreateAnnouncementPage() {
                         id="title"
                         required
                         aria-invalid={formErrors.title}
+                        defaultValue={announcement?.title}
                         className="text-base"
                       />
                     </FieldContent>
@@ -125,6 +167,7 @@ export default function CreateAnnouncementPage() {
                         id="desc"
                         required
                         aria-invalid={formErrors.description}
+                        defaultValue={announcement?.description}
                         className="text-base"
                       />
                     </FieldContent>
@@ -138,6 +181,7 @@ export default function CreateAnnouncementPage() {
                         placeholder="Image URL for thumbnail (optional)"
                         id="thumb"
                         className="text-base"
+                        defaultValue={announcement?.thumbnail}
                       />
                     </FieldContent>
                   </Field>
@@ -145,7 +189,7 @@ export default function CreateAnnouncementPage() {
                   <Field>
                     <FieldLabel>Priority</FieldLabel>
                     <FieldContent>
-                      <Select name="priority" defaultValue="3">
+                      <Select name="priority" defaultValue={announcement?.priority.toString()}>
                         <SelectTrigger className="w-full text-base">
                           <SelectValue placeholder="Select priority" />
                         </SelectTrigger>
@@ -167,7 +211,7 @@ export default function CreateAnnouncementPage() {
                       disabled={isSubmitting}
                       className="grow"
                     >
-                      {isSubmitting ? "Creating..." : "Create"}
+                      {isSubmitting ? "Saving Changes..." : "Save Changes"}
                     </Button>
                     <Button
                       type="button"
@@ -186,7 +230,7 @@ export default function CreateAnnouncementPage() {
                 <div className="sticky top-20 lg:top-16">
                   <label className="text-sm font-medium mb-2 block">Content</label>
                   <div className="border border-border rounded-lg">
-                    <RichTextEditor className="max-h-[calc(100vh-170px)]" onContentChange={setContent} />
+                    <RichTextEditor className="max-h-[calc(100vh-170px)]" onContentChange={setContent} defaultContent={content} />
                   </div>
                 </div>
               </div>

@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Search, Plus } from "lucide-react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { useSession } from "next-auth/react";
 
 interface Announcement {
   id: number;
@@ -27,6 +28,7 @@ interface Announcement {
 
 export default function AnnouncementsPage() {
   const perms = usePerms();
+  const session = useSession();
   const [searchTerm, setSearchTerm] = useState("");
   const [announcementIds, setAnnouncementIds] = useState<number[]>([]);
   const [announcements, setAnnouncements] = useState<Map<number, Announcement>>(new Map());
@@ -81,7 +83,7 @@ export default function AnnouncementsPage() {
             <InputGroupAddon align="inline-end"><Search /></InputGroupAddon>
           </InputGroup>
           {
-            (perms.role === "teacher" || perms.role === "admin") && (
+            (perms && (perms.role === "teacher" || perms.role === "admin")) && (
               <Link href="/app/announcements/create">
                 <Button size="icon"><Plus /></Button>
               </Link>
@@ -105,6 +107,7 @@ export default function AnnouncementsPage() {
                     author={{name: announcement.authorName, image: announcement.authorImage || ""}}
                     date={announcement.date}
                     priority={announcement.priority}
+                    editable={perms && (perms.role === "teacher" || perms.role === "admin") ? announcement.author_id === session.data?.user?.id : false}
                   />
                 )
               }

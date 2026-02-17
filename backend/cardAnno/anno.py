@@ -77,7 +77,6 @@ def edit_announcement(
     description: str | None = None,
     content: str | None = None,
     thumbnail: str | None = None,
-    date: str | None = None,
     priority: int | None = None,
 ) -> AnnouncementReturn | None:
     announcement = session.get(Announcement, announcement_id)
@@ -92,8 +91,6 @@ def edit_announcement(
             announcement.content = content
         if thumbnail is not None:
             announcement.thumbnail = thumbnail
-        if date is not None:
-            announcement.date = date
         if priority is not None:
             announcement.priority = priority
         session.add(announcement)
@@ -106,6 +103,7 @@ def edit_announcement(
             id=announcement.id,
             title=announcement.title,
             description=announcement.description,
+            content=announcement.content,
             thumbnail=announcement.thumbnail,
             author_id=announcement.author_id,
             authorName=user.name,

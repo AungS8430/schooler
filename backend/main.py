@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_nextauth_jwt import NextAuthJWT
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
-from custom_types import OAuthUpsertIn, AnnouncementCreate
+from custom_types import OAuthUpsertIn, AnnouncementCreate, AnnouncementUpdate
 
 from user.auth import upsert_user_from_oauth, get_user_perms, OAuthAccountConflict
 from cardAnno.anno import (
@@ -233,15 +233,13 @@ def remove_announcement(
 @app.patch("/announcements/{announcement_id}")
 def update_announcement(
     announcement_id: int,
+    announcement_data: AnnouncementUpdate,
     jwt: Annotated[dict, Depends(JWT)],
-    title: str | None = None,
-    description: str | None = None,
-    content: str | None = None,
-    thumbnail: str | None = None,
-    date: str | None = None,
-    priority: int | None = None,
     session: Session = Depends(get_session),
 ):
+    user_id = jwt.get("sub")
+    if not user_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid JWT: missing sub claim")
     user_id = jwt.get("sub")
     if not user_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid JWT: missing sub claim")
@@ -255,13 +253,12 @@ def update_announcement(
     updated_announcement = edit_announcement(
         session=session,
         announcement_id=announcement_id,
-        title=title,
-        description=description,
-        content=content,
-        thumbnail=thumbnail,
+        title=announcement_data.title,
+        description=announcement_data.description,
+        content=announcement_data.content,
+        thumbnail=announcement_data.thumbnail,
         user_id=user_id,
-        date=date,
-        priority=priority,
+        priority=announcement_data.priority,
     )
     if not updated_announcement:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Announcement not found")

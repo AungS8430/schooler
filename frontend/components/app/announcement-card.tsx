@@ -10,6 +10,7 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Pencil } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -21,9 +22,10 @@ interface AnnouncementCardProps {
   author: { name: string; image: string};
   date: string;
   priority: number;
+  editable?: boolean;
 }
 
-export default function AnnouncementCard({ id, title, description, thumbnail, author, date, priority }: AnnouncementCardProps) {
+export default function AnnouncementCard({ id, title, description, thumbnail, author, date, priority, editable }: AnnouncementCardProps) {
   return (
     <Card className="w-88 max-h-120 shrink-0">
       {
@@ -56,10 +58,15 @@ export default function AnnouncementCard({ id, title, description, thumbnail, au
         </div>
 
       </CardContent>
-      <CardFooter>
-        <Button className="w-full" asChild>
+      <CardFooter className="flex flex-row gap-2">
+        <Button className="grow" asChild>
           <Link href={`/app/announcements/${id}`}>View Announcement</Link>
         </Button>
+        {editable && (
+          <Button variant="outline" size="icon" asChild>
+            <Link href={`/app/announcements/edit/${id}`}><Pencil /></Link>
+          </Button>
+        )}
       </CardFooter>
     </Card>
   )

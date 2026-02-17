@@ -74,15 +74,18 @@ const extensions = [
 export function RichTextEditor({
   className,
   ref,
-  onContentChange
+  onContentChange,
+  defaultContent,
 }: {
   className?: string;
   ref?: React.Ref<HTMLDivElement>;
   onContentChange?: (content: any) => void;
+  defaultContent?: string;
 }) {
   const editor = useEditor({
     immediatelyRender: false,
     extensions: extensions as Extension[],
+    content: JSON.parse(defaultContent || "{}"),
     editorProps: {
       attributes: {
         class: "max-w-full focus:outline-none",
@@ -99,7 +102,7 @@ export function RichTextEditor({
   return (
     <div
       className={cn(
-        "relative w-full overflow-hidden overflow-y-scroll border bg-card pb-[60px] sm:pb-0",
+        "relative w-full overflow-hidden overflow-y-scroll border bg-card pb-15 sm:pb-0",
         className
       )}
     >
