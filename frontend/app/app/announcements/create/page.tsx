@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { usePerms } from "@/lib/perms";
 import {
@@ -69,8 +69,14 @@ export default function CreateAnnouncementPage() {
     }
   }
 
+  useEffect(() => {
+    if (perms.role !== "teacher" && perms.role !== "admin") {
+      router.replace("/app/announcements");
+    }
+  }, [perms]);
+
   return (
-    perms.role === "teacher" || perms.role === "admin" ? (
+    perms.role === "teacher" || perms.role === "admin" && (
       <div className="flex flex-col h-screen w-full">
         {/* Header */}
         <div className="sticky top-0 z-10 border-border">
@@ -189,12 +195,6 @@ export default function CreateAnnouncementPage() {
           <ScrollBar />
         </ScrollArea>
       </div>
-    ) : (
-      typeof perms === "undefined" && (
-        <div className="flex items-center justify-center h-screen">
-          <span className="text-lg text-muted-foreground">Loading permissions...</span>
-        </div>
-      )
     )
   );
 }
