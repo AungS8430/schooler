@@ -1,3 +1,6 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardAction,
@@ -10,9 +13,20 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface AnnouncementCardProps {
   id: number;
@@ -26,6 +40,7 @@ interface AnnouncementCardProps {
 }
 
 export default function AnnouncementCard({ id, title, description, thumbnail, author, date, priority, editable }: AnnouncementCardProps) {
+  const router = useRouter();
   return (
     <Card className="w-88 max-h-120 shrink-0">
       {
@@ -63,9 +78,45 @@ export default function AnnouncementCard({ id, title, description, thumbnail, au
           <Link href={`/app/announcements/${id}`}>View Announcement</Link>
         </Button>
         {editable && (
-          <Button variant="outline" size="icon" asChild>
-            <Link href={`/app/announcements/${id}/edit`}><Pencil /></Link>
-          </Button>
+          <div className="flex flex-row gap-1">
+            <Button variant="outline" size="icon" asChild>
+              <Link href={`/app/announcements/${id}/edit`}><Pencil /></Link>
+            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button size="icon" variant="destructive"><Trash /></Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure you want to delete this announcement?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => {
+                    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/announcements/${id}`, {
+                      method: "DELETE",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      credentials: "include",
+                    })
+                      .then(() => {
+                        router.push("/app/announcements");
+                      })
+                      .catch((error) => {
+                        console.error("Error deleting announcement:", error);
+                      });
+                  }} variant="destructive">
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+
         )}
       </CardFooter>
     </Card>

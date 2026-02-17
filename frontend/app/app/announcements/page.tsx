@@ -84,9 +84,11 @@ export default function AnnouncementsPage() {
           </InputGroup>
           {
             (perms && (perms.role === "teacher" || perms.role === "admin")) && (
-              <Link href="/app/announcements/create">
-                <Button size="icon"><Plus /></Button>
-              </Link>
+              <Button size="icon" asChild>
+                <Link href="/app/announcements/create">
+                  <Plus />
+                </Link>
+              </Button>
             )
           }
         </div>
