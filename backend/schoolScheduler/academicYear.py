@@ -17,7 +17,7 @@ def get_events(room: Room) -> list[Event]:
                 id=idx,
                 date=event["date"],
                 duration=event.get("duration", 1),
-                title=event["title"],
+                title=event["event"],
                 description=event.get("description", ""),
                 type=event.get("type", "general"),
             )
@@ -34,7 +34,7 @@ def get_events_all() -> list[Event]:
                 id=idx,
                 date=event["date"],
                 duration=event.get("duration", 1),
-                title=event["title"],
+                title=event["event"],
                 description=event.get("description", ""),
                 type=event.get("type", "general"),
             )
