@@ -15,7 +15,7 @@ def get_events(room: Room) -> list[Event]:
         out.append(
             Event(
                 id=idx,
-                date=date.strptime(event["date"], "%Y-%m-%d"),
+                date=event["date"],
                 duration=event.get("duration", 1),
                 title=event["title"],
                 description=event.get("description", ""),
@@ -32,7 +32,7 @@ def get_events_all() -> list[Event]:
         out.append(
             Event(
                 id=idx,
-                date=date.strptime(event["date"], "%Y-%m-%d"),
+                date=event["date"],
                 duration=event.get("duration", 1),
                 title=event["title"],
                 description=event.get("description", ""),
