@@ -35,6 +35,10 @@ def upsert_user_from_oauth(
 
     if existing_acc:
         user = session.get(User, existing_acc.user_id) if existing_acc.user_id else None
+        if user is None:
+            raise OAuthAccountConflict(
+                "OAuth account linked to non-existent user, data integrity issue"
+            )
         if tokens:
             existing_acc.access_token_enc = encrypt_token(tokens.get("access_token"))
             existing_acc.refresh_token_enc = encrypt_token(tokens.get("refresh_token"))
