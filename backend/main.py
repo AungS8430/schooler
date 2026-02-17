@@ -218,7 +218,7 @@ def read_announcements(
     session: Session = Depends(get_session),
     query: Optional[str] = None,
 ):
-    user_id = ensure_jwt_and_get_sub(jwt)
+    ensure_jwt_and_get_sub(jwt)
     announcement_ids = fetch_user_announcements(session, query)
     return {"announcement_ids": announcement_ids}
 
@@ -229,7 +229,7 @@ def read_announcement(
     jwt: Annotated[Optional[dict], Depends(JWT)],
     session: Session = Depends(get_session),
 ):
-    user_id = ensure_jwt_and_get_sub(jwt)
+    ensure_jwt_and_get_sub(jwt)
     announcement = get_announcement_by_ID(session, announcement_id)
     if not announcement:
         raise HTTPException(
@@ -246,6 +246,11 @@ def create_announcement(
 ):
     user_id = ensure_jwt_and_get_sub(jwt)
     permissions = get_user_perms(session, user_id)
+    if permissions is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Forbidden: You do not have permission to create announcements",
+        )
     if not permissions.get("role") or permissions.get("role") not in [
         "admin",
         "teacher",
@@ -424,7 +429,7 @@ def get_classes(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid grade"
         )
-    user_id = ensure_jwt_and_get_sub(jwt)
+    ensure_jwt_and_get_sub(jwt)
     if department is None:
         year = 1
         return {"department": CLASSES_LOOKUP[year]}
@@ -439,7 +444,7 @@ def get_people(
     department: Optional[str] = None,
     class_: Optional[int] = None,
 ):
-    user_id = ensure_jwt_and_get_sub(jwt)
+    ensure_jwt_and_get_sub(jwt)
     exected_query = (
         select(User)
         .where(User.year == grade if grade is not None else True)
