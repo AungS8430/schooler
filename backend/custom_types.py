@@ -122,13 +122,13 @@ class Calendar:
 
 @dataclass
 class AnnouncementReturn:
-    id: int
+    id: Optional[int]
     title: str
     description: str
     content: Optional[str]
     thumbnail: Optional[str]
     author_id: str
-    authorName: str
+    authorName: Optional[str]
     authorImage: Optional[str]
     date: str
     priority: int
