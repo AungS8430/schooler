@@ -21,37 +21,67 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { List, Users } from "lucide-react";
 import Link from "next/link";
 
+interface Grade {
+  key: string;
+  value: string;
+}
+
 export default function ClassesPage() {
-  const [gradeList, setGradeList] = useState<string[]>(["1st Year", "2nd Year", "3rd Year"]);
-  const [selectedGrade, setSelectedGrade] = useState<string>("2nd Year");
-  const [classList, setClassList] = useState<string[]>([
-    "C2R1",
-    "C2R2",
-    "M2R1",
-    "M2R2",
-    "E2R1",
-    "E2R2"
-  ]);
+  const [gradeList, setGradeList] = useState<Grade[]>([]);
+  const [selectedGrade, setSelectedGrade] = useState<Grade | null>(null);
+  const [classList, setClassList] = useState<string[]>([]);
 
   useEffect(() => {
-    if (!selectedGrade && gradeList.length > 0) {
-      setSelectedGrade(classList[0]);
-    }
-  }, [selectedGrade, gradeList]);
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/grades`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        const gradesArray = Object.entries(data.grades).map(([key, value]) => ({
+          key,
+          value: value as string
+        }));
+        setGradeList(gradesArray);
+      })
+      .catch((error) => {
+        console.error("Error fetching grades:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/classes${selectedGrade?.key ? ("?grade=" + selectedGrade.key) : ""}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setClassList(data.classes);
+      })
+      .catch((error) => {
+        console.error("Error fetching classes:", error);
+      });
+  }, [selectedGrade]);
 
   return (
     <div className="flex flex-col justify-start items-center max-w-5xl w-full h-screen gap-0 mx-auto overflow-hidden">
       <div className="flex flex-col gap-2 sticky top-0 z-10 w-full p-3">
         <h1 className="text-2xl font-semibold">Classes</h1>
         <div className="flex gap-2 items-center w-full max-w-full">
-          <Combobox required items={gradeList} value={selectedGrade} onValueChange={(value) => setSelectedGrade(value || "")} autoHighlight>
+          <Combobox required items={gradeList} itemToStringValue={(grade: Grade) => grade.value} value={selectedGrade} onValueChange={(value) => setSelectedGrade(value)} autoHighlight>
             <ComboboxInput placeholder="Select a class..." showClear className="grow" />
             <ComboboxContent>
               <ComboboxEmpty>No class found.</ComboboxEmpty>
               <ComboboxList>
                 {(item) => (
-                  <ComboboxItem key={item} value={item}>
-                    {item}
+                  <ComboboxItem key={item.key} value={item}>
+                    {item.value}
                   </ComboboxItem>
                 )}
               </ComboboxList>
@@ -62,7 +92,7 @@ export default function ClassesPage() {
       <ScrollArea className="p-4 w-full overflow-auto max-w-full">
         <div className="flex flex-col gap-2 mb-12 md:mb-0">
           {
-            classList.map((className) => (
+            classList && classList.map((className) => (
               <Card key={className} size="sm" className="bg-card/50">
                 <CardHeader>
                   <CardTitle>{className}</CardTitle>

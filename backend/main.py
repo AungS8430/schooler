@@ -411,18 +411,7 @@ def get_grades(
     jwt: Annotated[Optional[dict], Depends(JWT)],
     session: Session = Depends(get_session),
 ):
-    user_id = ensure_jwt_and_get_sub(jwt)
-    user = session.get(User, user_id)
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-        )
-    if user is None:
-        year = 1
-    else:
-        year = 1 if user.year is None else user.year
-    grade = f"{GRADE_LOOKUP[year]}"
-    return {"grades": grade}
+    return {"grades": GRADE_LOOKUP}
 
 
 @app.get("/classes")
