@@ -9,6 +9,7 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Button } from "@/components/ui/button";
+import SpinnerOverlay from "@/components/app/spinner";
 import Link from "next/link";
 import { Search, Plus } from "lucide-react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -30,7 +31,7 @@ export default function AnnouncementsPage() {
   const perms = usePerms();
   const session = useSession();
   const [searchTerm, setSearchTerm] = useState("");
-  const [announcementIds, setAnnouncementIds] = useState<number[]>([]);
+  const [announcementIds, setAnnouncementIds] = useState<number[] | null>();
   const [announcements, setAnnouncements] = useState<Map<number, Announcement>>(new Map());
 
   function fetchAnnouncementIds() {
@@ -54,6 +55,7 @@ export default function AnnouncementsPage() {
   }, [searchTerm])
 
   useEffect(() => {
+    if (!announcementIds) return;
     for (const id of announcementIds) {
       if (!announcements.has(id)) {
         fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/announcements/${id}`, {
@@ -96,7 +98,7 @@ export default function AnnouncementsPage() {
       <ScrollArea className="flex flex-col justify-start w-full max-w-full gap-6 overflow-y-auto p-3 pt-0 flex-1 mb-12 md:mb-0">
         <div className="grid lg:grid-cols-2 2xl:grid-cols-3 gap-2">
           {
-            announcementIds.map((id) => {
+            announcementIds ? announcementIds.map((id) => {
               if (announcements.has(id)) {
                 const announcement = announcements.get(id)!;
                 return (
@@ -113,7 +115,9 @@ export default function AnnouncementsPage() {
                   />
                 )
               }
-            })
+            }) : (
+              <SpinnerOverlay />
+            )
           }
         </div>
         <ScrollBar />
