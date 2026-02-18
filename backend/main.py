@@ -371,7 +371,7 @@ def get_school_timetable(
     else:
         year = 1 if user.year is None else user.year
         department = "computer" if user.department is None else user.department
-        class_ = 1 if user.class_ is None else int(user.class_)
+        class_ = 1 if user.class_ is None else user.class_
     room = Room(year, department, class_)
     return fixed_week_schedule(room)
 

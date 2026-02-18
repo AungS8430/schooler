@@ -1,5 +1,4 @@
 "use client";
-"use client";
 
 import { useState, useEffect, useRef } from "react";
 import Timetable from "@/components/app/timetable";
