@@ -32,6 +32,8 @@ from schoolScheduler import (
     get_events,
     get_events_all,
     week_schedule,
+    get_slots,
+    get_class
 )
 from user.auth import OAuthAccountConflict, get_user_perms, upsert_user_from_oauth
 
@@ -357,23 +359,26 @@ def get_personal_calendar(
     return get_academic_info(get_events(room)).convert()
 
 
+@app.get("/get-slots")
+def get_slots_endpoint():
+    return {"slots": get_slots()}
+
+
 @app.get("/school-timetable")
 def get_school_timetable(
     jwt: Annotated[Optional[dict], Depends(JWT)],
     session: Session = Depends(get_session),
+    class_: Optional[str] = None,
 ):
     user_id = ensure_jwt_and_get_sub(jwt)
     user = session.get(User, user_id)
-    if user is None:
-        year = 1
-        department = "computer"
-        class_ = 1
-    else:
-        year = 1 if user.year is None else user.year
-        department = "computer" if user.department is None else user.department
-        class_ = 1 if user.class_ is None else user.class_
-    room = Room(year, department, class_)
-    return fixed_week_schedule(room)
+    if not class_:
+        if user is None:
+            class_ = "C2R1"
+        else:
+            class_ = 1 if user.class_ is None else user.class_
+    f_class = get_class(class_)
+    return {"timetable": fixed_week_schedule(Room(f_class["year"], f_class["department"], class_))}
 
 
 @app.get("/dated-timetable")
@@ -423,18 +428,23 @@ def get_grades(
 @app.get("/classes")
 def get_classes(
     jwt: Annotated[Optional[dict], Depends(JWT)],
-    grade: int = 1,
+    grade: Optional[int] = None,
     department: Optional[str] = None,
 ):
-    if not 0 < grade < 6:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid grade"
-        )
     ensure_jwt_and_get_sub(jwt)
-    if department is None:
-        year = 1
-        return {"department": CLASSES_LOOKUP[year]}
-    return {"classes": CLASSES_LOOKUP[grade][department]}
+    if department is None and grade is None:
+            classes = [class_item for grade_classes in CLASSES_LOOKUP.values() for dep, classes in grade_classes.items() for class_item in classes]
+    elif department is None:
+            classes = [class_item for dep, classes in CLASSES_LOOKUP.get(grade, {}).items() for class_item in classes]
+    elif grade is None:
+        classes = []
+        for grade_classes in CLASSES_LOOKUP.values():
+            for dep in grade_classes.keys():
+                if dep == department:
+                        classes.extend(grade_classes[dep])
+    else:
+        classes = [class_item for dep, classes in CLASSES_LOOKUP.get(grade, {}).items() if dep == department for class_item in classes]
+    return {"classes": classes}
 
 
 @app.get("/people")

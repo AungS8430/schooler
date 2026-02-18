@@ -13,10 +13,106 @@ import {
 import { Button } from "@/components/ui/button";
 import { toPng } from "html-to-image";
 
+type Slot = {
+  id: string;
+  start: string; // e.g. '08:00'
+  end: string;   // e.g. '08:10'
+};
+type Subject = {
+  id: string;
+  title: string;
+  slotIds: string[]; // can span multiple slots
+  location?: string;
+  endsEarly?: boolean;
+  overlapsBreak?: boolean;
+  isBreak?: boolean;
+  isLunch?: boolean;
+  teacher?: string;
+  classroom?: string;
+}
+
 export default function SchedulePage() {
-  const [classList] = useState<string[]>(["C2R1", "C2R2", "M2R1", "M2R2", "E2R1", "E2R2"]);
-  const [selectedClass, setSelectedClass] = useState<string>("C2R2");
+  const [classList, setClassList] = useState<string[]>([]);
+  const [selectedClass, setSelectedClass] = useState<string>("");
+  const [timetableData, setTimetableData] = useState<{ [day: number]: Subject[] } | null>(null);
+  const [slots, setSlots] = useState<Slot[] | null>([]);
   const timetableRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/classes`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.classes && Array.isArray(data.classes)) {
+          setClassList(data.classes);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching class list:", error);
+      });
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/permissions`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.permissions.class) {
+          setSelectedClass(data.permissions.class);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching user permissions:", error);
+      });
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/get-slots`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.slots && Array.isArray(data.slots)) {
+          setSlots(data.slots);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching slots:", error);
+      })
+
+  }, []);
+
+  useEffect(() => {
+    if (!selectedClass) return;
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/school-timetable?class_=${encodeURIComponent(selectedClass)}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.timetable) {
+          setTimetableData(data.timetable[0]);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching schedule:", error);
+      });
+  }, [selectedClass]);
+
+  useEffect(() => {
+    console.log(timetableData);
+  }, [timetableData]);
 
   useEffect(() => {
     if (!selectedClass && classList.length > 0) {
@@ -203,10 +299,12 @@ export default function SchedulePage() {
           </Button>
         </div>
       </div>
-      <div ref={timetableRef} className="p-4 w-fit overflow-x-auto max-w-full mb-12 md:mb-0">
-        <Timetable />
-        <div className="w-full text-right pt-2 text-sm">Class schedule for {selectedClass}</div>
-      </div>
+      {timetableData && slots && (
+        <div ref={timetableRef} className="p-4 w-fit overflow-x-auto max-w-full mb-12 md:mb-0">
+          <Timetable timetable={timetableData} slots={slots} />
+          <div className="w-full text-right pt-2 text-sm">Class schedule for {selectedClass}</div>
+        </div>
+      )}
     </div>
   );
 }

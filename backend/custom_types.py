@@ -23,21 +23,15 @@ class RoleEnum(str, Enum):
 
 TIME_LOOKUP = {1: "Monday", 2: "Tuesday", 3: "Wednesday", 4: "Thursday", 5: "Friday"}
 GRADE = ["year1", "year2", "year3", "year4", "year5"]
-DEPARTMENT = ["computer", "mechatronic", "electrical"]
+DEPARTMENT = ["Computer Engineering", "Mechatronics Engineering", "Electrical and Electronics Engineering"]
 ROOM = [f"room{x}" for x in range(1, 11)]
 GRADE_LOOKUP = {
-    1: "1st year",
-    2: "2nd year",
-    3: "3rd year",
-    4: "4th year",
-    5: "5th year",
+    1: "1st Year",
+    2: "2nd Year",
+    3: "3rd Year",
 }
 CLASSES_LOOKUP = {
-    1: {"computer": [1, 2], "mechatronic": [1, 2], "electrical": [1, 2]},
-    2: {"computer": [1, 2], "mechatronic": [1, 2], "electrical": [1, 2]},
-    3: {"computer": [1, 2], "mechatronic": [1], "electrical": [1]},
-    4: {"computer": [1], "mechatronic": [1], "electrical": [1]},
-    5: {"computer": [1], "mechatronic": [1], "electrical": [1]},
+    2: {"Computer Engineering": ["C2R1", "C2R2"], "Mechatronics Engineering": ["M2R1", "M2R2"], "Electrical and Electronics Engineering": ["E2R1", "E2R2"]},
 }
 
 
@@ -54,7 +48,7 @@ class OverrideType(Enum):
 class TimeScheduleTS:
     id: str
     title: str
-    slotIDs: list[str]
+    slotIds: list[str]
     location: str | None = None
     endsEarly: bool = False
     overlapsBreak: bool = False

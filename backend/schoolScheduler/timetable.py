@@ -4,8 +4,8 @@ from datetime import date, timedelta
 from typing import Any
 
 from common import Room, check_tag_strong
-from custom_types import TIME_LOOKUP, TimeScheduleTS
-from schoolScheduler.loader import load_event, load_schedule, load_special
+from custom_types import TIME_LOOKUP, CLASSES_LOOKUP, TimeScheduleTS
+from schoolScheduler.loader import load_event, load_schedule, load_special, load_slots
 
 
 def convert_timetable(
@@ -47,7 +47,7 @@ def convert_timetable(
             TimeScheduleTS(
                 id=id,
                 title=title,
-                slotIDs=[
+                slotIds=[
                     f"s{x + 1 if not passLunch else x + 2}"
                     for x in range(timeslot, timeslot + duration)
                 ],
@@ -76,7 +76,7 @@ def get_special(
 def build_by_date(room: Room, when: date) -> tuple[list[dict[str, Any]], list]:
     events = load_event()
     schedule = load_schedule()
-    selectedRoom = schedule[f"year{room.year}"][room.department][f"room{room.room}"][
+    selectedRoom = schedule[f"{room.room}"][
         TIME_LOOKUP[when.isoweekday()]
     ]
     out: list = deepcopy(selectedRoom)
@@ -89,7 +89,7 @@ def build_by_date(room: Room, when: date) -> tuple[list[dict[str, Any]], list]:
             if not check_tag_strong(action["for"], room.toTag()):
                 continue
             tem = get_special(
-                schedule[f"year{room.year}"][room.department][f"room{room.room}"],
+                schedule[f"room{room.room}"],
                 action["with"],
             )
             actionDid.append((action["action"], tem[1]))
@@ -125,3 +125,14 @@ def fixed_week_schedule(
     room: Room,
 ) -> tuple[dict[int, list[dict[str, Any]]], dict[int, list]]:
     return week_schedule(room, date(1970, 1, 1))
+
+
+def get_slots() -> list[dict[str, Any]]:
+    return load_slots()
+
+def get_class(room: str) -> dict[str, Any]:
+    for year, departments in CLASSES_LOOKUP.items():
+        for department, rooms in departments.items():
+            if room in rooms:
+                return {"department": department, "year": year}
+    return {}

@@ -28,103 +28,48 @@ type Subject = {
   teacher?: string;
   classroom?: string;
 }
-export const slots: Slot[] = [
-  { id: 's1', start: '08:00', end: '08:10' },
-  { id: 's2', start: '08:15', end: '09:05' },
-  { id: 's3', start: '09:05', end: '09:55' },
-  { id: 's4', start: '10:05', end: '10:55' },
-  { id: 's5', start: '10:55', end: '11:45' },
-  { id: 's6', start: '11:45', end: '12:40' },
-  { id: 's7', start: '12:40', end: '13:30' },
-  { id: 's8', start: '13:30', end: '14:20' },
-  { id: 's9', start: '14:30', end: '15:20' },
-  { id: 's10', start: '15:20', end: '16:10' },
-  { id: 's11', start: '16:10', end: '17:00' },
-  { id: 's12', start: '17:00', end: '17:50' }
-];
-export const timetable: { [day: number]: Subject[] } = {
-  1: [
-    { id: 'shr', title: 'SHR', slotIds: ['s1'] },
-    { id: 'english4', title: 'English 4', slotIds: ['s2', 's3'] },
-    { id: 'ece2', title: 'Electrical Circuits and Electronics 2', slotIds: ['s4', 's5'] },
-    { id: 'lunch', title: 'Lunch', slotIds: ['s6'], isLunch: true },
-    { id: 'japanese4', title: 'Japanese 4', slotIds: ['s7', 's8'] },
-    { id: 'calculus2', title: 'Calculus 2', slotIds: ['s9', 's10'] },
-  ],
-  2: [
-    { id: 'shr', title: 'SHR', slotIds: ['s1'] },
-    { id: 'programming4', title: 'Programming 4', slotIds: ['s2', 's3', 's4'] },
-    { id: 'labwork6', title: 'Room : Labwork 6 (CE) (8.15-10.45)', slotIds: ['s2', 's3', 's4'], endsEarly: true, overlapsBreak: true },
-    { id: 'lunch', title: 'Lunch', slotIds: ['s6'], isLunch: true },
-    { id: 'thailang4', title: 'Thai Language 4', slotIds: ['s7', 's8'] },
-    { id: 'hpe4', title: 'Health & Physical Education 4', slotIds: ['s9', 's10'] },
-  ],
-  3: [
-    { id: 'shr', title: 'SHR', slotIds: ['s1'] },
-    { id: 'chemistry3', title: 'Chemistry 3', slotIds: ['s2', 's3'] },
-    { id: 'logicdesign', title: 'Logic Design and Sequential Circuits', slotIds: ['s4', 's5'] },
-    { id: 'lunch', title: 'Lunch', slotIds: ['s6'], isLunch: true },
-    { id: 'introcn', title: 'Intro. to Computer Network & Security', slotIds: ['s7', 's8'] },
-    { id: 'linearalgebra2', title: 'Linear Algebra 2', slotIds: ['s9', 's10'] },
-  ],
-  4: [
-    { id: 'shr', title: 'SHR', slotIds: ['s1'] },
-    { id: 'calculus2', title: 'Calculus 2', slotIds: ['s2'] },
-    { id: 'mathinfo', title: 'Mathematics for information Technology', slotIds: ['s3', 's4', 's5'] },
-    { id: 'lunch', title: 'Lunch', slotIds: ['s6'], isLunch: true },
-    { id: 'labwork4', title: 'Lab work 4 for Basic Computer Engineering', slotIds: ['s7', 's8', 's9'], classroom: "Labwork 7 (EE)" },
-    { id: 'classactivity', title: 'Class Activity / LHR', slotIds: ['s10'] },
-  ],
-  5: [
-    { id: 'shr', title: 'SHR', slotIds: ['s1'] },
-    { id: 'physics4', title: 'Physics 4', slotIds: ['s2', 's3'] },
-    { id: 'introcn', title: 'Intro. to Computer Network & Security', slotIds: ['s4', 's5'], classroom: "Labwork 6 (CE)" },
-    { id: 'lunch', title: 'Lunch', slotIds: ['s6'], isLunch: true },
-    { id: 'japanese4', title: 'Japanese 4', slotIds: ['s7', 's8'] },
-    { id: 'thaiculture', title: 'Thai culture/Social study 1', slotIds: ['s9', 's10'] },
-  ]
-};
 
 const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-function getLastUsedSlotIndex(): number {
-  let lastIndex = 0;
-  for (const daySubjects of Object.values(timetable)) {
-    for (const subject of daySubjects) {
-      for (const slotId of subject.slotIds) {
-        const idx = slots.findIndex(s => s.id === slotId);
-        if (idx > lastIndex) lastIndex = idx;
-      }
-    }
-  }
-  return lastIndex;
-}
-
-const lastUsedIndex = getLastUsedSlotIndex();
-const usedSlots = slots.slice(0, lastUsedIndex + 1);
-
-function getCurrentSlot(slotsToCheck: Slot[], currentTime: string) {
-  const [curHour, curMin] = currentTime.split(":").map(Number);
-  const curMinutes = curHour * 60 + curMin;
-  for (const slot of slotsToCheck) {
-    const [startHour, startMin] = slot.start.split(":").map(Number);
-    const [endHour, endMin] = slot.end.split(":").map(Number);
-    const startMinutes = startHour * 60 + startMin;
-    const endMinutes = endHour * 60 + endMin;
-    if (curMinutes >= startMinutes && curMinutes < endMinutes) {
-      return slot.id;
-    }
-  }
-  return null;
-}
-
-export default function Timetable({ qClass, dynamic }: { qClass?: string; dynamic?: boolean }) {
+export default function Timetable({ dynamic, timetable, slots }: { dynamic?: boolean, timetable: { [day: number]: Subject[] }, slots: Slot[] }) {
   const [currentDay, setCurrentDay] = useState<number>(0);
   const [currentTime, setCurrentTime] = useState<string>("");
   const [dayColumnWidth, setDayColumnWidth] = useState<number>(112); // default 7rem
   const [gridWidth, setGridWidth] = useState<number>(0);
   const dayColumnRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
+
+  function getLastUsedSlotIndex(): number {
+    let lastIndex = 0;
+    for (const daySubjects of Object.values(timetable)) {
+      for (const subject of daySubjects) {
+        for (const slotId of subject.slotIds) {
+          const idx = slots.findIndex(s => s.id === slotId);
+          if (idx > lastIndex) lastIndex = idx;
+        }
+      }
+    }
+    return lastIndex;
+  }
+
+  const lastUsedIndex = getLastUsedSlotIndex();
+  const usedSlots = slots.slice(0, lastUsedIndex + 1);
+
+  function getCurrentSlot(slotsToCheck: Slot[], currentTime: string) {
+    const [curHour, curMin] = currentTime.split(":").map(Number);
+    const curMinutes = curHour * 60 + curMin;
+    for (const slot of slotsToCheck) {
+      const [startHour, startMin] = slot.start.split(":").map(Number);
+      const [endHour, endMin] = slot.end.split(":").map(Number);
+      const startMinutes = startHour * 60 + startMin;
+      const endMinutes = endHour * 60 + endMin;
+      if (curMinutes >= startMinutes && curMinutes < endMinutes) {
+        return slot.id;
+      }
+    }
+    return null;
+  }
+
 
   useEffect(() => {
     if (!dynamic) return;
