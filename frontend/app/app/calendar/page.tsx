@@ -50,7 +50,7 @@ export default function CalendarPage() {
   const [calendar, setCalendar] = useState<Calendar | null>(null);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/school-academic-calendar`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/calendar/academic`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

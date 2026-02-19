@@ -17,7 +17,8 @@ def get_people(
     session: SessionDep,
     grade: Optional[int] = None,
     department: Optional[str] = None,
-    class_: Optional[int] = None,
+    class_: Optional[str] = None,
+    search: Optional[str] = None,
 ):
     """Get list of people filtered by grade, department, and/or class."""
     ensure_jwt_and_get_sub(jwt)
@@ -26,9 +27,10 @@ def get_people(
         .where(User.year == grade if grade is not None else True)
         .where(User.department == department if department is not None else True)
         .where(User.class_ == class_ if class_ is not None else True)
+        .where((User.name.ilike(f"%{search}%") | User.personnelID.ilike(f"%{search}%")) if search is not None else True)
     )
     users = session.exec(executed_query).all()
-    users_data = [x.model_dump_json() for x in users]
+    users_data = [x.model_dump() for x in users]
     return {"users": users_data}
 
 

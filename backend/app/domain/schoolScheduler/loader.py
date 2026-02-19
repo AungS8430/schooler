@@ -40,7 +40,7 @@ def load_event():
 
 @cache
 def load_academic_info():
-    file_path = Path(__file__).parent.parent.parent.parent / "volumes" / "academic_info.json"
+    file_path = Path(__file__).parent.parent.parent.parent / "volumes" / "academicInfo.json"
     with open(file_path) as file:
         out = json.loads(file.read())
     return out

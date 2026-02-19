@@ -39,7 +39,7 @@ export default function SchedulePage() {
   const timetableRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/classes`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/people/classes`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -55,7 +55,7 @@ export default function SchedulePage() {
       .catch((error) => {
         console.error("Error fetching class list:", error);
       });
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/permissions`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/auth/permissions`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -71,7 +71,7 @@ export default function SchedulePage() {
       .catch((error) => {
         console.error("Error fetching user permissions:", error);
       });
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/get-slots`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/schedule/slots`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -92,7 +92,7 @@ export default function SchedulePage() {
 
   useEffect(() => {
     if (!selectedClass) return;
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/school-timetable?class_=${encodeURIComponent(selectedClass)}`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/schedule/timetable?class_=${encodeURIComponent(selectedClass)}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

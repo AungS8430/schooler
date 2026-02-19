@@ -16,9 +16,9 @@ class OAuthUpsertIn(BaseModel):
 
 
 class RoleEnum(str, Enum):
-    ADMIN = "admin"
-    TEACHER = "teacher"
-    STUDENT = "student"
+    ADMIN = "Admin"
+    TEACHER = "Teacher"
+    STUDENT = "Student"
 
 
 TIME_LOOKUP = {1: "Monday", 2: "Tuesday", 3: "Wednesday", 4: "Thursday", 5: "Friday"}

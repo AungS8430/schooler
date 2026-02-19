@@ -32,7 +32,7 @@ export default function ClassesPage() {
   const [classList, setClassList] = useState<string[]>([]);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/grades`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/people/grades`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -53,7 +53,7 @@ export default function ClassesPage() {
   }, []);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/classes${selectedGrade?.key ? ("?grade=" + selectedGrade.key) : ""}`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/people/classes${selectedGrade?.key ? ("?grade=" + selectedGrade.key) : ""}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -75,9 +75,9 @@ export default function ClassesPage() {
         <h1 className="text-2xl font-semibold">Classes</h1>
         <div className="flex gap-2 items-center w-full max-w-full">
           <Combobox required items={gradeList} itemToStringValue={(grade: Grade) => grade.value} value={selectedGrade} onValueChange={(value) => setSelectedGrade(value)} autoHighlight>
-            <ComboboxInput placeholder="Select a class..." showClear className="grow" />
+            <ComboboxInput placeholder="Select a grade..." showClear className="grow" />
             <ComboboxContent>
-              <ComboboxEmpty>No class found.</ComboboxEmpty>
+              <ComboboxEmpty>No grade found.</ComboboxEmpty>
               <ComboboxList>
                 {(item) => (
                   <ComboboxItem key={item.key} value={item}>
