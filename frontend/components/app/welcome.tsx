@@ -1,15 +1,14 @@
-import { auth } from "@/lib/auth";
-
-export default async function WelcomeHeader() {
-  const session = await auth();
+import { useSession } from "next-auth/react";
+export default function WelcomeHeader({ schedule }: { schedule?: boolean}) {
+  const session = useSession();
   return (
     <header className="w-full">
       <h1 className="text-xl md:text-2xl font-semibold truncate">
-        Welcome, {session?.user.name || "User"}!
+        Welcome, {session?.data?.user.name || "User"}!
       </h1>
-      <h3 className="text-base md:text-lg text-muted-foreground truncate">
+      {schedule && (<h3 className="text-base md:text-lg text-muted-foreground truncate">
         Here's your class schedule for this week.
-      </h3>
+      </h3>)}
     </header>
   );
 }
