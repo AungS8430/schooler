@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import Timetable from "@/components/app/timetable";
 import {
   Combobox,
@@ -37,6 +38,7 @@ export default function SchedulePage() {
   const [timetableData, setTimetableData] = useState<{ [day: number]: Subject[] } | null>(null);
   const [slots, setSlots] = useState<Slot[] | null>([]);
   const timetableRef = useRef<HTMLDivElement>(null);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/people/classes`, {
@@ -65,7 +67,12 @@ export default function SchedulePage() {
       .then((res) => res.json())
       .then((data) => {
         if (data.permissions.class) {
-          setSelectedClass(data.permissions.class);
+          const classParam = searchParams.get("class");
+          if (classParam) {
+            setSelectedClass(classParam);
+          } else {
+            setSelectedClass(data.permissions.class);
+          }
         }
       })
       .catch((error) => {

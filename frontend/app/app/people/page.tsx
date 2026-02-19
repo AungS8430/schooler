@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Combobox,
   ComboboxContent,
@@ -45,9 +46,10 @@ export default function ClassesPage() {
   const [gradeList, setGradeList] = useState<Grade[]>([]);
   const [selectedGrade, setSelectedGrade] = useState<Grade | null>(null);
   const [classList, setClassList] = useState<string[]>([]);
-  const [selectedClass, setSelectedClass] = useState<string | null>();
+  const [selectedClass, setSelectedClass] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [people, setPeople] = useState<Person[]>([]);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/people/grades`, {
@@ -81,6 +83,10 @@ export default function ClassesPage() {
       .then((res) => res.json())
       .then((data) => {
         setClassList(data.classes);
+        const classParam = searchParams.get("class");
+        if (classParam) {
+          setSelectedClass(classParam);
+        }
       })
       .catch((error) => {
         console.error("Error fetching classes:", error);
@@ -88,7 +94,7 @@ export default function ClassesPage() {
   }, [selectedGrade]);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/people?search=${searchQuery}${selectedClass ? ("&class=" + selectedClass) : ""}${selectedGrade ? ("&grade=" + selectedGrade.key) : ""}`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/people?search=${searchQuery}${selectedClass ? ("&class_=" + selectedClass) : ""}${selectedGrade ? ("&grade=" + selectedGrade.key) : ""}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -98,7 +104,6 @@ export default function ClassesPage() {
       .then((res) => res.json())
       .then((data) => {
         setPeople(data.users);
-        console.log(data.users);
       })
       .catch((error) => {
         console.error("Error fetching people:", error);

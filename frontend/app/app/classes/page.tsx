@@ -103,7 +103,7 @@ export default function ClassesPage() {
                     <Link href={`/app/schedule?class=${className}`}><List /> View Schedule</Link>
                   </Button>
                   <Button variant="link" size="sm" asChild>
-                    <Link href={`/app/students?class=${className}`}><Users /> View People</Link>
+                    <Link href={`/app/people?class=${className}`}><Users /> View People</Link>
                   </Button>
                 </CardFooter>
               </Card>
