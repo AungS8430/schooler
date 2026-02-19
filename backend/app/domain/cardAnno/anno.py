@@ -11,7 +11,7 @@ def fetch_user_announcements(
         query = query.strip()
 
     statement = (
-        select(Announcement).order_by(Announcement.priority.desc())  # pyright: ignore[reportAttributeAccessIssue]
+        select(Announcement).order_by(Announcement.date.desc())  # pyright: ignore[reportAttributeAccessIssue]
     )
     announcements = session.exec(statement).all()
     filtered = [
