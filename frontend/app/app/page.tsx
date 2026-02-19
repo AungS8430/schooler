@@ -9,7 +9,6 @@ import { ChevronRight, Calendar } from "lucide-react";
 import ScrollGradient from "@/components/app/scroll-gradient";
 
 import Link from "next/link";
-import SpinnerOverlay from "@/components/app/spinner";
 
 type Slot = {
   id: string;
@@ -169,7 +168,7 @@ export default function HomePage() {
         <div className="flex flex-col">
           <ScrollGradient scrollClassName="flex flex-row max-w-full overflow-x-auto gap-2 py-2 justify-start">
             {
-              announcementIds ? announcementIds.map((id) => {
+              announcementIds && announcementIds.map((id) => {
                 if (announcements.has(id)) {
                   const announcement = announcements.get(id)!;
                   return (
@@ -185,9 +184,7 @@ export default function HomePage() {
                     />
                   )
                 }
-              }) : (
-                <SpinnerOverlay />
-              )
+              })
             }
           </ScrollGradient>
           <Button className="self-end" variant="link" asChild>
