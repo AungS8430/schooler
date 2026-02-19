@@ -1,9 +1,9 @@
 from sqlmodel import Session, select
 
-from common import check_tag_weak, tags_to_str
-from common.matching import str_to_tags
-from custom_types import RoleEnum
-from models import User
+from app.domain.common import check_tag_weak, tags_to_str
+from app.domain.common.matching import str_to_tags
+from app.schemas.types import RoleEnum
+from app.models import User
 
 
 def fetch_all_personnel(session: Session) -> list[User]:

@@ -4,8 +4,8 @@ from typing import Optional
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, select
 
-from models import OAuthAccount, User
-from user.security import encrypt_token
+from app.models import OAuthAccount, User
+from app.security import encrypt_token
 
 
 class OAuthAccountConflict(Exception):

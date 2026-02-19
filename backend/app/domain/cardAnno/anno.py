@@ -1,7 +1,7 @@
 from sqlmodel import Session, select
 
-from custom_types import AnnouncementReturn
-from models import Announcement, User
+from app.schemas.types import AnnouncementReturn
+from app.models import Announcement, User
 
 
 def fetch_user_announcements(

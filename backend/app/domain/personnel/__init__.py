@@ -1,6 +1,6 @@
-from custom_types import RoleEnum  # noqa : F401
-from models import User  # noqa : F401
-from personnel.personnel import (
+from app.schemas.types import RoleEnum  # noqa : F401
+from app.db.models import User  # noqa : F401
+from app.domain.personnel.personnel import (
     check_permission_to_edit,  # noqa : F401
     edit_personnel,  # noqa : F401
     fetch_all_personnel,  # noqa : F401

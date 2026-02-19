@@ -3,9 +3,9 @@ from dataclasses import asdict
 from datetime import date, timedelta
 from typing import Any
 
-from common import Room, check_tag_strong
-from custom_types import TIME_LOOKUP, CLASSES_LOOKUP, TimeScheduleTS
-from schoolScheduler.loader import load_event, load_schedule, load_special, load_slots
+from app.domain.common import Room, check_tag_strong
+from app.schemas.types import TIME_LOOKUP, CLASSES_LOOKUP, TimeScheduleTS
+from app.domain.schoolScheduler.loader import load_event, load_schedule, load_special, load_slots
 
 
 def convert_timetable(

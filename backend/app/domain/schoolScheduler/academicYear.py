@@ -1,6 +1,6 @@
-from common import check_tag_strong
-from custom_types import Calendar, Event, OverrideType, Room
-from schoolScheduler import loader
+from app.domain.common import check_tag_strong
+from app.schemas.types import Calendar, Event, OverrideType, Room
+from app.domain.schoolScheduler import loader
 
 
 def get_events(room: Room) -> list[Event]:
