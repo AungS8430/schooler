@@ -24,56 +24,50 @@ interface Resource {
   categories?: string[];
 }
 
-const sampleResources = [
-  {
-    id: 1,
-    title: "School Leave Request Form",
-    author: "Academic Affairs",
-    href: "#",
-    categories: ["Forms", "Academic"]
-  },
-  {
-    id: 2,
-    title: "Student Handbook",
-    author: "Student Affairs",
-    href: "#",
-    categories: ["Guide", "Academic"]
-  },
-  {
-    id: 3,
-    title: "Scholarship Application Guide",
-    author: "Financial Aid Office",
-    href: "#",
-    categories: ["Forms", "Financial"]
-  },
-  {
-    id: 4,
-    title: "Campus Map",
-    author: "Facilities Management",
-    href: "#",
-    categories: ["Guide", "Campus"]
-  },
-  {
-    id: 5,
-    title: "Library Resources Guide",
-    author: "Library Services",
-    href: "#",
-    categories: ["Guide", "Academic"]
-  },
-]
-
-
 export default function ResourcesPage() {
-  const [categoryList, setCategoryList] = useState<string[]>([
-    "Forms",
-    "Guides",
-    "Academic",
-    "Financial",
-    "Campus"
-  ]);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>();
+  const [categoryList, setCategoryList] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [resources, setResources] = useState<Resource[]>(sampleResources)
+  const [resources, setResources] = useState<Resource[]>([]);
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/resources/categories`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setCategoryList(data.categories);
+      })
+      .catch((error) => {
+        console.error("Error fetching categories:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams();
+    if (selectedCategory) queryParams.append("category", selectedCategory);
+    if (searchQuery) queryParams.append("search", searchQuery);
+
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/resources?${queryParams.toString()}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data)
+        setResources(data.resources);
+      })
+      .catch((error) => {
+        console.error("Error fetching resources:", error);
+      });
+  }, [selectedCategory, searchQuery]);
 
   return (
     <div className="flex flex-col justify-start items-center max-w-5xl w-full h-screen gap-0 mx-auto overflow-hidden">
@@ -81,7 +75,7 @@ export default function ResourcesPage() {
         <h1 className="text-2xl font-semibold">Resources</h1>
         <div className="flex gap-2 items-center w-full max-w-full">
           <Input placeholder="Search resources..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="grow" />
-          <Combobox items={categoryList} value={selectedCategory || ""} onValueChange={(value) => setSelectedCategory(value)} autoHighlight>
+          <Combobox items={categoryList} value={selectedCategory || ""} onValueChange={(value) => setSelectedCategory(value || "")} autoHighlight>
             <ComboboxInput placeholder="Select a category..." showClear={true} />
             <ComboboxContent>
               <ComboboxEmpty>No category found.</ComboboxEmpty>

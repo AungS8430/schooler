@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "title": "School Leave Form",
+    "author": "Academic Affairs",
+    "href": "https://drive.google.com/drive/u",
+    "categories": ["Forms", "Academic"]
+  },
+  {
+    "id": 2,
+    "title": "Dormitory Application Guide",
+    "author": "Student Affairs",
+    "href": "https://drive.google.com/drive/u",
+    "categories": ["Guides", "Dormitory"]
+  },
+  {
+    "id": 3,
+    "title": "Financial Aid Application Form",
+    "author": "Financial Aid Office",
+    "href": "https://drive.google.com/drive/u",
+    "categories": ["Forms", "Financial"]
+  },
+  {
+    "id": 4,
+    "title": "Course Registration Guide",
+    "author": "Academic Affairs",
+    "href": "https://drive.google.com/drive/u",
+    "categories": ["Guides", "Academic"]
+  },
+  {
+    "id": 5,
+    "title": "Dormitory Rules and Regulations",
+    "author": "Student Affairs",
+    "href": "https://drive.google.com/drive/u",
+    "categories": ["Guides", "Dormitory"]
+  }
+]
