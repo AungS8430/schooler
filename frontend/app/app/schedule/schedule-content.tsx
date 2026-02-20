@@ -66,7 +66,7 @@ export function ScheduleContent() {
     })
       .then((res) => res.json())
       .then((data) => {
-        if (data.permissions.class) {
+        if (data.permissions && data.permissions.class) {
           const classParam = searchParams.get("class");
           if (classParam) {
             setSelectedClass(classParam);

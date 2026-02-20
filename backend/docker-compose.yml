@@ -4,14 +4,14 @@ services:
     env_file:
       - .env
     restart: always
+    networks:
+      - schooler-network
     environment:
       POSTGRES_USER: ${DB_USER:-user}
       POSTGRES_PASSWORD: ${DB_PASS:-password}
       POSTGRES_DB: ${DB_NAME:-schooler_db}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
     command: ["postgres", "-c", "max_connections=200"]
     healthcheck:
       test:
@@ -24,25 +24,28 @@ services:
       retries: 5
 
   fastapi:
-    env_file:
-      - .env
-    volumes:
-      - ./:/app
-    image: schooler_fastapi:latest
-    build:
-      context: ./
-      dockerfile: Dockerfile
+    image: aungs8430/schooler-fastapi:latest
     container_name: schooler_fastapi
     restart: unless-stopped
+    networks:
+      - schooler-network
     ports:
       - "8000:8000"
+    volumes:
+      - ${PWD}/volumes:/app/volumes
     environment:
       DB_USER: ${DB_USER:-user}
       DB_PASS: ${DB_PASS:-password}
-      DB_HOST: ${DB_HOST:-postgres}
+      DB_HOST: postgres
       DB_PORT: ${DB_PORT:-5432}
       DB_NAME: ${DB_NAME:-schooler_db}
       UVICORN_APPS: main:app
+      SECRET: ${SECRET}
+      INTERNAL_API_SECRET: ${INTERNAL_API_SECRET}
+      AUTH_URL: ${AUTH_URL}
+      ENV: ${ENV}
+    env_file:
+      - .env
     depends_on:
       postgres:
         condition: service_healthy
@@ -50,3 +53,8 @@ services:
 volumes:
   postgres_data:
     driver: local
+
+networks:
+  schooler-network:
+    driver: bridge
+

@@ -57,7 +57,7 @@ export default function HomePage() {
     })
       .then((res) => res.json())
       .then((data) => {
-        if (data.permissions.class) {
+        if (data.permissions && data.permissions.class) {
           setSelectedClass(data.permissions.class);
         }
       })
