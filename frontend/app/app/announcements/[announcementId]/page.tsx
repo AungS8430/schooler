@@ -45,7 +45,7 @@ export default function AnnouncementPage({ params }: { params: Promise<{ announc
   const [announcement, setAnnouncement] = useState<Announcement | null>(null);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/announcements/${announcementId}`, {
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL}/api/v1/announcements/${announcementId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -101,7 +101,7 @@ export default function AnnouncementPage({ params }: { params: Promise<{ announc
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction onClick={() => {
-                        fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/announcements/${announcement.id}`, {
+                        fetch(`${process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL}/api/v1/announcements/${announcement.id}`, {
                           method: "DELETE",
                           headers: {
                             "Content-Type": "application/json",

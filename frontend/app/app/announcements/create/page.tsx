@@ -52,7 +52,7 @@ export default function CreateAnnouncementPage() {
     };
 
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/announcements`, {
+      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL}/api/v1/announcements`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

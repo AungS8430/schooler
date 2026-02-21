@@ -68,7 +68,7 @@ export default function EditAnnouncementPage({ params }: { params: Promise<{ ann
     };
 
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/announcements/${announcementId}`, {
+      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL}/api/v1/announcements/${announcementId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -86,7 +86,7 @@ export default function EditAnnouncementPage({ params }: { params: Promise<{ ann
 
   useEffect(() => {
     if (!announcementId) return;
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/announcements/${announcementId}`, {
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL}/api/v1/announcements/${announcementId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

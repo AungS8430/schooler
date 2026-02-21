@@ -35,7 +35,7 @@ export default function AnnouncementsPage() {
   const [announcements, setAnnouncements] = useState<Map<number, Announcement>>(new Map());
 
   function fetchAnnouncementIds() {
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/announcements?query=${encodeURIComponent(searchTerm)}`, {
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL}/api/v1/announcements?query=${encodeURIComponent(searchTerm)}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -58,7 +58,7 @@ export default function AnnouncementsPage() {
     if (!announcementIds) return;
     for (const id of announcementIds) {
       if (!announcements.has(id)) {
-        fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/announcements/${id}`, {
+        fetch(`${process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL}/api/v1/announcements/${id}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

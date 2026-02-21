@@ -96,7 +96,7 @@ export default function AnnouncementCard({ id, title, description, thumbnail, au
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction onClick={() => {
-                    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/announcements/${id}`, {
+                    fetch(`${process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL}/api/v1/announcements/${id}`, {
                       method: "DELETE",
                       headers: {
                         "Content-Type": "application/json",

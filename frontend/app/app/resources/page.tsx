@@ -31,7 +31,7 @@ export default function ResourcesPage() {
   const [resources, setResources] = useState<Resource[]>([]);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/resources/categories`, {
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL}/api/v1/resources/categories`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -52,7 +52,7 @@ export default function ResourcesPage() {
     if (selectedCategory) queryParams.append("category", selectedCategory);
     if (searchQuery) queryParams.append("search", searchQuery);
 
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/resources?${queryParams.toString()}`, {
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL}/api/v1/resources?${queryParams.toString()}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

@@ -52,7 +52,7 @@ export function PeopleContent() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/people/grades`, {
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL}/api/v1/people/grades`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -73,7 +73,7 @@ export function PeopleContent() {
   }, []);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/people/classes${selectedGrade?.key ? ("?grade=" + selectedGrade.key) : ""}`, {
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL}/api/v1/people/classes${selectedGrade?.key ? ("?grade=" + selectedGrade.key) : ""}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -94,7 +94,7 @@ export function PeopleContent() {
   }, [selectedGrade, searchParams]);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/people?search=${searchQuery}${selectedClass ? ("&class_=" + selectedClass) : ""}${selectedGrade ? ("&grade=" + selectedGrade.key) : ""}`, {
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL}/api/v1/people?search=${searchQuery}${selectedClass ? ("&class_=" + selectedClass) : ""}${selectedGrade ? ("&grade=" + selectedGrade.key) : ""}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
