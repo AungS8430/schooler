@@ -28,7 +28,7 @@ export const authConfig = {
         return false;
       }
       try {
-        const res = await fetch(`${process.env.BASE_URL ?? process.env.NEXT_PUBLIC_BASE_URL}/auth/v1/auth/oauth/upsert`, {
+        const res = await fetch(`${process.env.BASE_URL ?? process.env.NEXT_PUBLIC_BASE_URL}/api/v1/auth/oauth/upsert`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
