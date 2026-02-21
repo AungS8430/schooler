@@ -7,15 +7,10 @@ from app.database import engine
 
 router = APIRouter(tags=["health"])
 
-@router.get("/")
-async def bounce_jwt(jwt: JWTDep):
-    """Echo back JWT token for verification."""
-    if jwt is None or not isinstance(jwt, dict):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid JWT: authentication required",
-        )
-    return jwt
+@router.get("/", tags=["health"])
+async def health_check():
+    """Public health check endpoint."""
+    return {"status": "ok"}
 
 
 @router.get("/getDBHealthCheck")
