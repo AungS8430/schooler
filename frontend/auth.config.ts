@@ -14,24 +14,6 @@ export const authConfig = {
       },
     }),
   ],
-  cookies: {
-    sessionToken: {
-      name:
-        process.env.NODE_ENV === "development"
-          ? "next-auth.session-token"
-          : "__Secure-next-auth.session-token",
-      options: {
-        httpOnly: true,
-        sameSite: process.env.NODE_ENV === "development" ? "lax" : "none",
-        path: "/",
-        secure: process.env.NODE_ENV !== "development",
-        domain:
-          process.env.NODE_ENV === "development"
-            ? undefined
-            : process.env.PARENT_DOMAIN,
-      }
-    }
-  },
   pages: {
     signIn: "/",
   },
@@ -46,7 +28,7 @@ export const authConfig = {
         return false;
       }
       try {
-        const res = await fetch(`${process.env.API_BASE ?? process.env.NEXT_PUBLIC_API_BASE}/auth/oauth/upsert`, {
+        const res = await fetch(`${process.env.BASE_URL ?? process.env.NEXT_PUBLIC_BASE_URL}/auth/v1/auth/oauth/upsert`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -91,7 +73,7 @@ export const authConfig = {
     async jwt({ token, user, account, profile }) {
       if (account && profile) {
         try {
-          const res = await fetch(`${process.env.API_BASE}/internal/oauth/upsert`, {
+          const res = await fetch(`${process.env.BASE_URL ?? process.env.NEXT_PUBLIC_BASE_URL}/internal/oauth/upsert`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

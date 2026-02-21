@@ -41,7 +41,7 @@ export function ScheduleContent() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/people/classes`, {
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL}/api/v1/people/classes`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -57,7 +57,7 @@ export function ScheduleContent() {
       .catch((error) => {
         console.error("Error fetching class list:", error);
       });
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/auth/permissions`, {
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL}/api/v1/auth/permissions`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -78,7 +78,7 @@ export function ScheduleContent() {
       .catch((error) => {
         console.error("Error fetching user permissions:", error);
       });
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/schedule/slots`, {
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL}/api/v1/schedule/slots`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -99,7 +99,7 @@ export function ScheduleContent() {
 
   useEffect(() => {
     if (!selectedClass) return;
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/schedule/timetable?class_=${encodeURIComponent(selectedClass)}`, {
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL}/api/v1/schedule/timetable?class_=${encodeURIComponent(selectedClass)}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

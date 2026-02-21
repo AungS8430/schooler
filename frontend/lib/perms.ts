@@ -10,7 +10,7 @@ export function usePerms() {
   const [perms, setPerms] = useState<Perms | null>(null);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/auth/permissions`, {
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL}/api/v1/auth/permissions`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

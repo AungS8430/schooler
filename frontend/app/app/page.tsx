@@ -48,7 +48,7 @@ export default function HomePage() {
   const [announcements, setAnnouncements] = useState<Map<number, Announcement>>(new Map());
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/auth/permissions`, {
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL}/api/v1/auth/permissions`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -64,7 +64,7 @@ export default function HomePage() {
       .catch((error) => {
         console.error("Error fetching user permissions:", error);
       });
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/schedule/slots`, {
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL}/api/v1/schedule/slots`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -80,7 +80,7 @@ export default function HomePage() {
       .catch((error) => {
         console.error("Error fetching slots:", error);
       })
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/announcements`, {
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL}/api/v1/announcements`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -98,7 +98,7 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!selectedClass) return;
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/schedule/timetable?class_=${encodeURIComponent(selectedClass)}`, {
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL}/api/v1/schedule/timetable?class_=${encodeURIComponent(selectedClass)}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -120,7 +120,7 @@ export default function HomePage() {
     if (!announcementIds) return;
     for (const id of announcementIds) {
       if (!announcements.has(id)) {
-        fetch(`${process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE}/announcements/${id}`, {
+        fetch(`${process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL}/api/v1/announcements/${id}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
