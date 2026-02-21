@@ -6,6 +6,8 @@ services:
     restart: always
     networks:
       - schooler-network
+    ports:
+      - "${DB_PORT:-5432}:5432"
     environment:
       POSTGRES_USER: ${DB_USER:-user}
       POSTGRES_PASSWORD: ${DB_PASS:-password}
@@ -37,7 +39,7 @@ services:
       DB_USER: ${DB_USER:-user}
       DB_PASS: ${DB_PASS:-password}
       DB_HOST: postgres
-      DB_PORT: ${DB_PORT:-5432}
+      DB_PORT: 5432
       DB_NAME: ${DB_NAME:-schooler_db}
       UVICORN_APPS: main:app
       SECRET: ${SECRET}

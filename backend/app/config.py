@@ -42,7 +42,7 @@ if INTERNAL_API_SECRET is None:
     logger.warning("INTERNAL_API_SECRET Not found.")
 
 # CORS Configuration
-CORS_ORIGINS = ["http://localhost:3000"]
+CORS_ORIGINS = getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
 
 # Database connection args
 CONNECT_ARGS = {}
