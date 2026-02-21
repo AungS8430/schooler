@@ -1,0 +1,62 @@
+services:
+  postgres:
+    image: postgres:15
+    env_file:
+      - .env
+    restart: always
+    networks:
+      - schooler-network
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    environment:
+      POSTGRES_USER: ${DB_USER:-user}
+      POSTGRES_PASSWORD: ${DB_PASS:-password}
+      POSTGRES_DB: ${DB_NAME:-schooler_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    command: ["postgres", "-c", "max_connections=200"]
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${DB_USER:-user} -d ${DB_NAME:-schooler_db}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  fastapi:
+    image: aungs8430/schooler-fastapi:latest
+    container_name: schooler_fastapi
+    restart: unless-stopped
+    networks:
+      - schooler-network
+    ports:
+      - "8000:8000"
+    volumes:
+      - ${PWD}/volumes:/app/volumes
+    environment:
+      DB_USER: ${DB_USER:-user}
+      DB_PASS: ${DB_PASS:-password}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-schooler_db}
+      UVICORN_APPS: main:app
+      SECRET: ${SECRET}
+      INTERNAL_API_SECRET: ${INTERNAL_API_SECRET}
+      AUTH_URL: ${AUTH_URL}
+      ENV: ${ENV}
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  schooler-network:
+    driver: bridge
+

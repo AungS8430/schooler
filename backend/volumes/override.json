@@ -1,0 +1,184 @@
+[
+  {
+    "date": "2025-12-02",
+    "duration": 1,
+    "event": "Friday class",
+    "description": "Friday class schedule",
+    "type": "class",
+    "actions": [
+      {
+        "action": "replace",
+        "for": [["all-classes"]],
+        "with": "class-Friday"
+      }
+    ]
+  },
+  {
+    "date": "2025-12-05",
+    "duration": 1,
+    "event": "No class",
+    "description": "No class schedule",
+    "type": "holiday",
+    "actions": [
+      {
+        "action": "replace",
+        "for": [["all-classes"]],
+        "with": "no-class"
+      }
+    ]
+  },
+  {
+    "date": "2025-12-08",
+    "duration": 1,
+    "event": "Wednesday class",
+    "description": "Wednesday class schedule",
+    "type": "class",
+    "actions": [
+      {
+        "action": "replace",
+        "for": [["all-classes"]],
+        "with": "class-Wednesday"
+      }
+    ]
+  },
+  {
+    "date": "2025-12-10",
+    "duration": 1,
+    "event": "No class",
+    "description": "No class schedule",
+    "type": "holiday",
+    "actions": [
+      {
+        "action": "replace",
+        "for": [["all-classes"]],
+        "with": "no-class"
+      }
+    ]
+  },
+  {
+    "date": "2025-12-24",
+    "duration": 3,
+    "event": "Midterm Exam",
+    "description": "Midterm Exam schedule",
+    "type": "exam",
+    "actions": [
+      {
+        "action": "replace",
+        "for": [["all-classes"]],
+        "with": "no-class-Exam"
+      }
+    ]
+  },
+  {
+    "date": "2025-12-29",
+    "duration": 2,
+    "event": "Midterm Exam",
+    "description": "Midterm Exam schedule",
+    "type": "exam",
+    "actions": [
+      {
+        "action": "replace",
+        "for": [["all-classes"]],
+        "with": "no-class-Exam"
+      }
+    ]
+  },
+  {
+    "date": "2025-12-31",
+    "duration": 3,
+    "event": "New Year Holiday",
+    "description": "New Year Holiday schedule",
+    "type": "holiday",
+    "actions": [
+      {
+        "action": "replace",
+        "for": [["all-classes"]],
+        "with": "no-class-Exam"
+      }
+    ]
+  },
+  {
+    "date": "2026-01-05",
+    "duration": 2,
+    "event": "Midterm Exam",
+    "description": "Midterm Exam schedule",
+    "type": "exam",
+    "actions": [
+      {
+        "action": "replace",
+        "for": [["all-classes"]],
+        "with": "no-class-Exam"
+      }
+    ]
+  },
+  {
+    "date": "2026-01-08",
+    "duration": 1,
+    "event": "Tuesday class",
+    "description": "Tuesday class schedule",
+    "type": "class",
+    "actions": [
+      {
+        "action": "replace",
+        "for": [["all-classes"]],
+        "with": "class-Tuesday"
+      }
+    ]
+  },
+  {
+    "date": "2026-02-04",
+    "duration": 1,
+    "event": "Friday class",
+    "description": "Friday class schedule",
+    "type": "class",
+    "actions": [
+      {
+        "action": "replace",
+        "for": [["all-classes"]],
+        "with": "class-Friday"
+      }
+    ]
+  },
+  {
+    "date": "2026-03-03",
+    "duration": 1,
+    "event": "Friday class",
+    "description": "Friday class schedule",
+    "type": "class",
+    "actions": [
+      {
+        "action": "replace",
+        "for": [["all-classes"]],
+        "with": "class-Friday"
+      }
+    ]
+  },
+  {
+    "date": "2026-03-09",
+    "duration": 5,
+    "event": "Final Exam",
+    "description": "Final Exam schedule",
+    "type": "exam",
+    "actions": [
+      {
+        "action": "replace",
+        "for": [["all-classes"]],
+        "with": "no-class-Exam"
+      }
+    ]
+  },
+  {
+    "date": "2026-03-16",
+    "duration": 2,
+    "event": "Final Exam",
+    "description": "Final Exam schedule",
+    "type": "exam",
+    "actions": [
+      {
+        "action": "replace",
+        "for": [["all-classes"]],
+        "with": "no-class-Exam"
+      }
+    ]
+  }
+]
