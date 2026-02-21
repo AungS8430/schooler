@@ -14,6 +14,18 @@ export const authConfig = {
       },
     }),
   ],
+  cookies: {
+    sessionToken: {
+      name: "__Secure-next-auth.session-token",
+      options: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        domain: process.env.PARENT_DOMAIN
+      }
+    }
+  },
   pages: {
     signIn: "/",
   },
