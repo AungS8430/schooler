@@ -16,13 +16,19 @@ export const authConfig = {
   ],
   cookies: {
     sessionToken: {
-      name: "__Secure-next-auth.session-token",
+      name:
+        process.env.NODE_ENV === "development"
+          ? "next-auth.session-token"
+          : "__Secure-next-auth.session-token",
       options: {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+        sameSite: process.env.NODE_ENV === "development" ? "lax" : "none",
         path: "/",
-        domain: process.env.PARENT_DOMAIN
+        secure: process.env.NODE_ENV !== "development",
+        domain:
+          process.env.NODE_ENV === "development"
+            ? undefined
+            : process.env.PARENT_DOMAIN,
       }
     }
   },
