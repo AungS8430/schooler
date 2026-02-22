@@ -9,7 +9,7 @@ export const authConfig = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       authorization: {
         params: {
-          hd: process.env.ALLOWED_DOMAIN, // UI hint for Google account selector
+          hd: process.env.ALLOWED_DOMAIN || null, // UI hint for Google account selector
         },
       },
     }),
