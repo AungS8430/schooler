@@ -23,8 +23,8 @@ export const authConfig = {
       const email = profile?.email as string | undefined;
       if (!email) return false;
       const domain = email.split("@")[1]?.toLowerCase();
-      const allowed = (process.env.ALLOWED_DOMAIN || "example.com").toLowerCase();
-      if (!(!!(domain === allowed && profile?.email_verified)) || !account) {
+      const allowed = process.env.ALLOWED_DOMAIN ? (process.env.ALLOWED_DOMAIN).toLowerCase() : null;
+      if (!((domain === allowed || allowed === null) && profile?.email_verified && account)) {
         return false;
       }
       try {
