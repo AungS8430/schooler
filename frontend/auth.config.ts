@@ -7,11 +7,11 @@ export const authConfig = {
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      authorization: {
+      authorization: process.env.ALLOWED_DOMAIN ? {
         params: {
-          hd: process.env.ALLOWED_DOMAIN || null, // UI hint for Google account selector
+          hd: process.env.ALLOWED_DOMAIN,
         },
-      },
+      } : undefined,
     }),
   ],
   pages: {
