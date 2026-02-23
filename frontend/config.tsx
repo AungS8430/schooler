@@ -1,4 +1,4 @@
-import { Users, School, List, Calendar, Book, Megaphone, Settings, MessageCircleQuestionMark } from "lucide-react";
+import { Users, School, List, Calendar, Book, Megaphone, Settings } from "lucide-react";
 
 export const PrimaryPages = [
   {
@@ -38,9 +38,4 @@ export const SecondaryPages = [
     label: "Settings",
     icon: <Settings />
   },
-  {
-    href:"/app/help",
-    label: "Help",
-    icon: <MessageCircleQuestionMark />
-  }
 ]
