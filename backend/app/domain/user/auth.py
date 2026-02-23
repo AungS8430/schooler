@@ -54,7 +54,7 @@ def upsert_user_from_oauth(
     user = session.exec(select(User).where(User.email == email_norm)).first()
 
     if not user:
-        user = User(id=str(uuid.uuid4()), email=email_norm, name=name, image=image, class_=random.choice(["C2R1", "C2R2"]), department="Computer Engineering", year=2, role="Student", personnelID=str(uuid.uuid4()))
+        user = User(id=str(uuid.uuid4()), email=email_norm, name=name, image=image)
         session.add(user)
         session.flush()
     else:
