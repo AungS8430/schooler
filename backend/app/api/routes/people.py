@@ -3,7 +3,7 @@
 from typing import Optional
 
 from fastapi import APIRouter
-from sqlmodel import Session, select
+from sqlmodel import select
 
 from app.api import JWTDep, SessionDep, ensure_jwt_and_get_sub
 from app.models import User

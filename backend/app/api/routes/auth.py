@@ -1,13 +1,18 @@
 """Authentication and user management routes."""
+
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Header, status
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 from sqlmodel import Session
 
 from app.api import JWTDep, SessionDep, ensure_jwt_and_get_sub, verify_internal_secret
 from app.config import INTERNAL_API_SECRET
 from app.database import get_session
-from app.domain.user.auth import get_user_perms, upsert_user_from_oauth, OAuthAccountConflict
+from app.domain.user.auth import (
+    OAuthAccountConflict,
+    get_user_perms,
+    upsert_user_from_oauth,
+)
 from app.schemas.types import OAuthUpsertIn
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -51,5 +56,3 @@ def read_permissions(
     user_id = ensure_jwt_and_get_sub(jwt)
     permissions = get_user_perms(session, user_id)
     return {"permissions": permissions}
-
-

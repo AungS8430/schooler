@@ -1,12 +1,13 @@
 """API route dependencies for JWT and session injection."""
+
 from typing import Annotated, Optional
 
-from fastapi import Depends, HTTPException, Header, status
+from fastapi import Depends, HTTPException, status
 from fastapi_nextauth_jwt import NextAuthJWT
+from sqlmodel import Session
 
 from app.config import JWT_SECRET
 from app.database import get_session
-from sqlmodel import Session
 
 # Initialize JWT handler
 JWT = NextAuthJWT(secret=JWT_SECRET)
@@ -35,8 +36,9 @@ def ensure_jwt_and_get_sub(jwt: Optional[dict]) -> str:
     return user_id
 
 
-def verify_internal_secret(x_internal_secret: Optional[str], expected_secret: Optional[str]) -> None:
+def verify_internal_secret(
+    x_internal_secret: Optional[str], expected_secret: Optional[str]
+) -> None:
     """Verify internal API secret for protected endpoints."""
     if not expected_secret or x_internal_secret != expected_secret:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
-

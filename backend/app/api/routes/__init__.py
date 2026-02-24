@@ -1,11 +1,12 @@
 """Health check and base routes."""
-from fastapi import APIRouter, HTTPException, status
+
+from fastapi import APIRouter
 from sqlmodel import Session, select
 
-from app.api import JWTDep, SessionDep, ensure_jwt_and_get_sub
 from app.database import engine
 
 router = APIRouter(tags=["health"])
+
 
 @router.get("/", tags=["health"])
 async def health_check():
@@ -26,4 +27,3 @@ async def get_db_health_check():
         return {"status": "healthy", "detail": "ok"}
     except Exception as e:
         return {"status": "unhealthy", "detail": str(e)}
-

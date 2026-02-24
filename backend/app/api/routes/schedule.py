@@ -4,7 +4,6 @@ from datetime import date
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException, status
-from sqlmodel import Session
 
 from app.api import JWTDep, SessionDep, ensure_jwt_and_get_sub
 from app.domain.schoolScheduler import (
