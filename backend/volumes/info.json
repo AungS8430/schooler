@@ -1,0 +1,19 @@
+{
+  "departments": [
+    "Computer Engineering",
+    "Mechatronics Engineering",
+    "Electrical and Electronics Engineering"
+  ],
+  "grades": {
+    "1": "1st Year",
+    "2": "2nd Year",
+    "3": "3rd Year"
+  },
+  "classes": {
+    "2": {
+      "Computer Engineering": ["C2R1", "C2R2"],
+      "Mechatronics Engineering": ["M2R1", "M2R2"],
+      "Electrical and Electronics Engineering": ["E2R1", "E2R2"]
+    }
+  }
+}
