@@ -1,9 +1,9 @@
 """Announcement management routes."""
+
 from datetime import datetime
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlmodel import Session
+from fastapi import APIRouter, HTTPException, status
 
 from app.api import JWTDep, SessionDep, ensure_jwt_and_get_sub
 from app.domain.cardAnno.anno import (
@@ -131,4 +131,3 @@ def update_announcement(
             status_code=status.HTTP_404_NOT_FOUND, detail="Announcement not found"
         )
     return {"announcement": updated_announcement}
-

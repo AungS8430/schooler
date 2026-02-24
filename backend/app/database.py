@@ -1,9 +1,10 @@
 """Database initialization and session management."""
+
 import logging
 from typing import Generator
 
-from sqlalchemy.orm import Session
-from sqlmodel import SQLModel, create_engine, Session as SQLSession
+from sqlmodel import Session as SQLSession
+from sqlmodel import SQLModel, create_engine
 
 from app.config import CONNECT_ARGS, DB_URL
 
@@ -23,5 +24,3 @@ def get_session() -> Generator[SQLSession, None, None]:
     """Dependency to provide database session to routes."""
     with SQLSession(engine) as session:
         yield session
-
-

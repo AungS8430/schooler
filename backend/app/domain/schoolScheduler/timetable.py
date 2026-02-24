@@ -4,8 +4,13 @@ from datetime import date, timedelta
 from typing import Any
 
 from app.domain.common import Room, check_tag_strong
-from app.schemas.types import TIME_LOOKUP, CLASSES_LOOKUP, TimeScheduleTS
-from app.domain.schoolScheduler.loader import load_event, load_schedule, load_special, load_slots
+from app.domain.schoolScheduler.loader import (
+    load_event,
+    load_schedule,
+    load_slots,
+    load_special,
+)
+from app.schemas.types import CLASSES_LOOKUP, TIME_LOOKUP, TimeScheduleTS
 
 
 def convert_timetable(
@@ -34,15 +39,18 @@ def convert_timetable(
     lastTimeslot = 1
     for timetable in dayTimetable:
         timeslot = timetable["timeslot"]
-        if hasLunch and timeslot > 4 and not passLunch:
-            passLunch = True
-            output.append(TimeScheduleTS("lunch", "Lunch", ["s6"], isLunch=True))
-        if timetable["id"] == "shr" or timetable["id"] == "lunch":
-            continue
         id = timetable.get("id", "")
         title = timetable.get("subject", "")
         duration = timetable.get("duration", 1)
         location = timetable.get("where", "")
+        if timeslot - lastTimeslot > 0:
+            output[-1].endsEarly = True
+        if hasLunch and timeslot > 4 and not passLunch:
+            passLunch = True
+            output.append(TimeScheduleTS("lunch", "Lunch", ["s6"], isLunch=True))
+            lastTimeslot = 6
+        if timetable["id"] == "shr" or timetable["id"] == "lunch":
+            continue
         output.append(
             TimeScheduleTS(
                 id=id,
@@ -55,8 +63,6 @@ def convert_timetable(
                 overlapsBreak=True if duration >= 3 else False,
             )
         )
-        if timeslot - lastTimeslot > 0:
-            output[-2].endsEarly = True
         lastTimeslot = timeslot + duration
     outFinal = [asdict(x) for x in output]
     return outFinal, rawTimetable[1]
@@ -76,9 +82,7 @@ def get_special(
 def build_by_date(room: Room, when: date) -> tuple[list[dict[str, Any]], list]:
     events = load_event()
     schedule = load_schedule()
-    selectedRoom = schedule[f"{room.room}"][
-        TIME_LOOKUP[when.isoweekday()]
-    ]
+    selectedRoom = schedule[f"{room.class_}"][TIME_LOOKUP[when.isoweekday()]]
     out: list = deepcopy(selectedRoom)
     actionDid = []
     for event in events:
@@ -89,7 +93,7 @@ def build_by_date(room: Room, when: date) -> tuple[list[dict[str, Any]], list]:
             if not check_tag_strong(action["for"], room.toTag()):
                 continue
             tem = get_special(
-                schedule[f"room{room.room}"],
+                schedule[f"{room.class_}"],
                 action["with"],
             )
             actionDid.append((action["action"], tem[1]))
@@ -129,6 +133,7 @@ def fixed_week_schedule(
 
 def get_slots() -> list[dict[str, Any]]:
     return load_slots()
+
 
 def get_class(room: str) -> dict[str, Any]:
     for year, departments in CLASSES_LOOKUP.items():
