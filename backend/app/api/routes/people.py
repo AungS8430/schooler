@@ -1,4 +1,5 @@
 """People/personnel management routes."""
+
 from typing import Optional
 
 from fastapi import APIRouter
@@ -27,7 +28,11 @@ def get_people(
         .where(User.year == grade if grade is not None else True)
         .where(User.department == department if department is not None else True)
         .where(User.class_ == class_ if class_ is not None else True)
-        .where((User.name.ilike(f"%{search}%") | User.personnelID.ilike(f"%{search}%")) if search is not None else True)
+        .where(
+            (User.name.ilike(f"%{search}%") | User.personnelID.ilike(f"%{search}%"))  # type: ignore
+            if search is not None
+            else True
+        )
     )
     users = session.exec(executed_query).all()
     users_data = [x.model_dump() for x in users]
@@ -59,7 +64,9 @@ def get_classes(
     elif department is None:
         classes = [
             class_item
-            for dep, classes_list in CLASSES_LOOKUP.get(grade, {}).items()
+            for dep, classes_list in CLASSES_LOOKUP.get(
+                grade if grade is not None else 1, {}
+            ).items()
             for class_item in classes_list
         ]
     elif grade is None:
@@ -76,4 +83,3 @@ def get_classes(
             for class_item in classes_list
         ]
     return {"classes": classes}
-
