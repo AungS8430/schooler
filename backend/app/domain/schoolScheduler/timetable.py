@@ -39,15 +39,18 @@ def convert_timetable(
     lastTimeslot = 1
     for timetable in dayTimetable:
         timeslot = timetable["timeslot"]
-        if hasLunch and timeslot > 4 and not passLunch:
-            passLunch = True
-            output.append(TimeScheduleTS("lunch", "Lunch", ["s6"], isLunch=True))
-        if timetable["id"] == "shr" or timetable["id"] == "lunch":
-            continue
         id = timetable.get("id", "")
         title = timetable.get("subject", "")
         duration = timetable.get("duration", 1)
         location = timetable.get("where", "")
+        if timeslot - lastTimeslot > 0:
+            output[-1].endsEarly = True
+        if hasLunch and timeslot > 4 and not passLunch:
+            passLunch = True
+            output.append(TimeScheduleTS("lunch", "Lunch", ["s6"], isLunch=True))
+            lastTimeslot = 6
+        if timetable["id"] == "shr" or timetable["id"] == "lunch":
+            continue
         output.append(
             TimeScheduleTS(
                 id=id,
@@ -60,8 +63,6 @@ def convert_timetable(
                 overlapsBreak=True if duration >= 3 else False,
             )
         )
-        if timeslot - lastTimeslot > 0:
-            output[-2].endsEarly = True
         lastTimeslot = timeslot + duration
     outFinal = [asdict(x) for x in output]
     return outFinal, rawTimetable[1]
