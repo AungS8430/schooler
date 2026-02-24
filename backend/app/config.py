@@ -1,4 +1,5 @@
 """Application configuration and environment variables."""
+
 import logging
 from os import getenv
 
@@ -51,4 +52,3 @@ if DB_URL.startswith("sqlite"):
 
 # Encryption
 ENCRYPTION_KEY = getenv("ENCRYPTION_KEY")
-

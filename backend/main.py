@@ -1,12 +1,10 @@
 """FastAPI application initialization and configuration."""
-import logging
+
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.config import CORS_ORIGINS, logger
-from app.database import create_db_and_tables
 from app.api import routes as health_routes
 from app.api.routes import (
     announcements,
@@ -16,6 +14,9 @@ from app.api.routes import (
     resources,
     schedule,
 )
+from app.config import CORS_ORIGINS, logger
+from app.database import create_db_and_tables
+
 
 # Lifespan context manager for startup/shutdown events
 @asynccontextmanager
@@ -52,5 +53,3 @@ app.include_router(calendar.router)
 app.include_router(schedule.router)
 app.include_router(people.router)
 app.include_router(resources.router)
-
-

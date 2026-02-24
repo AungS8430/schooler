@@ -1,4 +1,5 @@
 """User and authentication models."""
+
 from datetime import datetime
 from typing import List, Optional
 
@@ -54,4 +55,3 @@ class Announcement(SQLModel, table=True):
     author: "User" = Relationship(back_populates="announcements")
     date: str
     priority: int
-
