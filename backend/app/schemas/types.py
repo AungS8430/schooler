@@ -4,6 +4,16 @@ from enum import Enum
 from typing import Optional
 
 from pydantic import BaseModel
+from pathlib import Path
+import json
+from functools import cache
+
+@cache
+def load_info():
+    file_path = Path(__file__).parent.parent.parent / "volumes" / "info.json"
+    with open(file_path) as file:
+        out = json.loads(file.read())
+    return out
 
 
 class OAuthUpsertIn(BaseModel):
@@ -22,26 +32,11 @@ class RoleEnum(str, Enum):
 
 
 TIME_LOOKUP = {1: "Monday", 2: "Tuesday", 3: "Wednesday", 4: "Thursday", 5: "Friday"}
-GRADE = ["year1", "year2", "year3", "year4", "year5"]
-DEPARTMENT = [
-    "Computer Engineering",
-    "Mechatronics Engineering",
-    "Electrical and Electronics Engineering",
-]
-ROOM = [f"room{x}" for x in range(1, 11)]
-GRADE_LOOKUP = {
-    1: "1st Year",
-    2: "2nd Year",
-    3: "3rd Year",
-}
-CLASSES_LOOKUP = {
-    2: {
-        "Computer Engineering": ["C2R1", "C2R2"],
-        "Mechatronics Engineering": ["M2R1", "M2R2"],
-        "Electrical and Electronics Engineering": ["E2R1", "E2R2"],
-    },
-}
 
+info = load_info()
+DEPARTMENT = info["departments"]
+GRADE_LOOKUP = info["grades"]
+CLASSES_LOOKUP = info["classes"]
 
 class OverrideType(Enum):
     CLASS = "class"
