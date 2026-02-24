@@ -68,14 +68,14 @@ class TimeScheduleTS:
 class Room:
     year: int
     department: str
-    room: int
+    class_: str
 
     def toTag(self) -> list[str]:
-        return [f"year{self.year}", self.department, f"room{self.room}"]
+        return [f"year{self.year}", self.department, f"class-{self.class_}"]
 
 
 def room_from_tag(tags: list[str]) -> Room:
-    outRoom = Room(0, "None", 0)
+    outRoom = Room(0, "None", "class-C2R1")
     for tag in tags:
         if tag[:4] == "year":
             outRoom.year = int(tag[4:])
@@ -83,8 +83,8 @@ def room_from_tag(tags: list[str]) -> Room:
         if tag in DEPARTMENT:
             outRoom.department = tag
             continue
-        if tag[:4] == "room":
-            outRoom.room = int(tag[4:])
+        if tag[:6] == "class-":
+            outRoom.class_ = tag[6:]
     return outRoom
 
 

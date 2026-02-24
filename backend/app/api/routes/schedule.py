@@ -1,4 +1,5 @@
 """Timetable and schedule routes."""
+
 from datetime import date
 from typing import Optional
 
@@ -8,8 +9,8 @@ from sqlmodel import Session
 from app.api import JWTDep, SessionDep, ensure_jwt_and_get_sub
 from app.domain.schoolScheduler import (
     fixed_week_schedule,
-    get_slots,
     get_class,
+    get_slots,
     week_schedule,
 )
 from app.models import User
@@ -37,7 +38,7 @@ def get_school_timetable(
         if user is None:
             class_ = "C2R1"
         else:
-            class_ = "1" if user.class_ is None else user.class_
+            class_ = "C2R1" if user.class_ is None else user.class_
     f_class = get_class(class_)
     return {
         "timetable": fixed_week_schedule(
@@ -51,6 +52,7 @@ def get_dated_timetable(
     jwt: JWTDep,
     session: SessionDep,
     when: Optional[str] = None,
+    class_: Optional[str] = None,
 ):
     """Get the timetable for a specific date."""
     if when is None:
@@ -60,14 +62,15 @@ def get_dated_timetable(
         )
     user_id = ensure_jwt_and_get_sub(jwt)
     user = session.get(User, user_id)
-    if user is None:
-        year = 1
-        department = "computer"
-        class_ = 1
-    else:
-        year = 1 if user.year is None else user.year
-        department = "computer" if user.department is None else user.department
-        class_ = 1 if user.class_ is None else int(user.class_)
-    room = Room(year, department, class_)
-    return {"timetable": week_schedule(room, date.fromisoformat(when))}
-
+    if not class_:
+        if user is None:
+            class_ = "C2R1"
+        else:
+            class_ = "C2R1" if user.class_ is None else user.class_
+    f_class = get_class(class_)
+    return {
+        "timetable": week_schedule(
+            Room(f_class["year"], f_class["department"], class_),
+            date.fromisoformat(when),
+        )
+    }
