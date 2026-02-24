@@ -4,6 +4,16 @@ from enum import Enum
 from typing import Optional
 
 from pydantic import BaseModel
+from pathlib import Path
+import json
+from functools import cache
+
+@cache
+def load_info():
+    file_path = Path(__file__).parent.parent.parent / "volumes" / "info.json"
+    with open(file_path) as file:
+        out = json.loads(file.read())
+    return out
 
 
 class OAuthUpsertIn(BaseModel):
@@ -22,18 +32,11 @@ class RoleEnum(str, Enum):
 
 
 TIME_LOOKUP = {1: "Monday", 2: "Tuesday", 3: "Wednesday", 4: "Thursday", 5: "Friday"}
-GRADE = ["year1", "year2", "year3", "year4", "year5"]
-DEPARTMENT = ["Computer Engineering", "Mechatronics Engineering", "Electrical and Electronics Engineering"]
-ROOM = [f"room{x}" for x in range(1, 11)]
-GRADE_LOOKUP = {
-    1: "1st Year",
-    2: "2nd Year",
-    3: "3rd Year",
-}
-CLASSES_LOOKUP = {
-    2: {"Computer Engineering": ["C2R1", "C2R2"], "Mechatronics Engineering": ["M2R1", "M2R2"], "Electrical and Electronics Engineering": ["E2R1", "E2R2"]},
-}
 
+info = load_info()
+DEPARTMENT = info["departments"]
+GRADE_LOOKUP = info["grades"]
+CLASSES_LOOKUP = info["classes"]
 
 class OverrideType(Enum):
     CLASS = "class"
@@ -60,14 +63,14 @@ class TimeScheduleTS:
 class Room:
     year: int
     department: str
-    room: int
+    class_: str
 
     def toTag(self) -> list[str]:
-        return [f"year{self.year}", self.department, f"room{self.room}"]
+        return [f"year{self.year}", self.department, f"class-{self.class_}"]
 
 
 def room_from_tag(tags: list[str]) -> Room:
-    outRoom = Room(0, "None", 0)
+    outRoom = Room(0, "None", "class-C2R1")
     for tag in tags:
         if tag[:4] == "year":
             outRoom.year = int(tag[4:])
@@ -75,8 +78,8 @@ def room_from_tag(tags: list[str]) -> Room:
         if tag in DEPARTMENT:
             outRoom.department = tag
             continue
-        if tag[:4] == "room":
-            outRoom.room = int(tag[4:])
+        if tag[:6] == "class-":
+            outRoom.class_ = tag[6:]
     return outRoom
 
 
@@ -95,7 +98,7 @@ class Event:
             "type": self.type.value,
             "title": self.title,
             "start": (self.date).isoformat(),
-            "end": (self.date + timedelta(days=self.duration)).isoformat(),
+            "end": (self.date + timedelta(days=self.duration - 1)).isoformat(),
             "description": self.description,
         }
 
