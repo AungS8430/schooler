@@ -52,8 +52,8 @@ schooler/
 
 1. **Clone the repository:**
     ```bash
-    git clone https://github.com/AungS8430/formulistic1.git
-    cd formulistic1
+    git clone https://github.com/AungS8430/schooler.git
+    cd schooler
     ```
 
 2. **Install frontend dependencies:**
